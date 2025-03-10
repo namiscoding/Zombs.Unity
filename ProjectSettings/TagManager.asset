@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Grass
   - Items
-  - 
+  - Player
   - 
   - 
   - 
@@ -46,6 +46,9 @@ TagManager:
     locked: 0
   - name: Items
     uniqueID: 966864241
+    locked: 0
+  - name: Player
+    uniqueID: 2210515579
     locked: 0
   m_RenderingLayers:
   - Default
