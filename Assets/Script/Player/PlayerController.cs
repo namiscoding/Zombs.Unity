@@ -25,28 +25,8 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         MovePlayer();
-        //RotatePlayer();
     }
 
-    //void RotatePlayer()
-    //{
-    //    if (Input.mousePosition.x < 0 || Input.mousePosition.x > Screen.width ||
-    //        Input.mousePosition.y < 0 || Input.mousePosition.y > Screen.height)
-    //    {
-    //        return;
-    //    }
-
-    //    Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.transform.position.z * -1));
-    //    mouseWorldPosition.z = transform.position.z;
-
-    //    Vector3 displacement = mouseWorldPosition - transform.position;
-    //    float angle = Mathf.Atan2(displacement.y, displacement.x) * Mathf.Rad2Deg;
-
-    //    transform.rotation = Quaternion.Euler(0, 0, angle + 180f);
-
-    //    // Send the angle to Animator
-    //    animator.SetFloat("Angle", angle);
-    //}
 
     void MovePlayer()
     {
