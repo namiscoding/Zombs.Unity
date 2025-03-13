@@ -8,6 +8,9 @@ TagManager:
   - Blue
   - Green
   - Red
+  - weaponENemy
+  - armEnemy
+  - bodyEnemy
   layers:
   - Default
   - TransparentFX
@@ -18,7 +21,7 @@ TagManager:
   - Grass
   - Enemy
   - Player
-  - 
+  - Arm
   - 
   - 
   - 
@@ -50,6 +53,12 @@ TagManager:
     locked: 0
   - name: Items
     uniqueID: 966864241
+    locked: 0
+  - name: Arm
+    uniqueID: 2655609725
+    locked: 0
+  - name: Enemy
+    uniqueID: 1934058131
     locked: 0
   m_RenderingLayers:
   - Default
