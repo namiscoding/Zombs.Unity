@@ -6,13 +6,14 @@ public class Mainmenu : MonoBehaviour
     public GameObject revivePanel;
     public GameObject startGamePanel;
     public TMP_InputField playerNameInput; // Reference to the InputField
+    public GameObject ShopPanel;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         revivePanel.SetActive(false);
         startGamePanel.SetActive(true);
-
+        ShopPanel.SetActive(false);
         // Automatically find the InputField if not assigned in Inspector
         if (playerNameInput == null)
         {
@@ -25,6 +26,14 @@ public class Mainmenu : MonoBehaviour
     void Update()
     {
 
+    }
+
+    public void OpenShop()
+    {
+        ShopPanel.SetActive(true);
+    }
+    public void CloseShop() {
+        ShopPanel.SetActive(false);
     }
 
     public void Revive()
