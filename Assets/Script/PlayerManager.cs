@@ -119,4 +119,14 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Player name set to: " + playerName);
         // You could also update a UI element here if you have a name display
     }
+
+    //Phương thức hồi Full máu
+    public void FullHeal()
+{
+    health = maxHealth;
+    healthPlayer.UpdatePlayerHealth(health, maxHealth); // Cập nhật UI thanh máu
+    Debug.Log("Fully healed! Current health: " + health);
+}
+
+
 }
