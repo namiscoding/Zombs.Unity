@@ -7,6 +7,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float speed = 5.0f;
     [SerializeField] private float health, maxHealth = 10;
     [SerializeField] private HealthPlayer healthPlayer;
+    [SerializeField] private float armor, maxArmor = 10;
+    [SerializeField] private ArmorPlayer armorPlayer;
     [SerializeField] private Sprite hammerSprite;
     [SerializeField] private Sprite swordSprite;
     [SerializeField] private Sprite bowSprite;
@@ -19,9 +21,12 @@ public class PlayerManager : MonoBehaviour
     private Mainmenu mainmenu;
     public TextMeshProUGUI playerName; 
 
+    private bool isArmorVisible = false; // Ẩn thanh Armor khi bắt đầu game
+
     void Awake()
     {
         healthPlayer = GetComponentInChildren<HealthPlayer>();
+        armorPlayer = GetComponentInChildren<ArmorPlayer>();
     }
 
     void Start()
@@ -34,6 +39,9 @@ public class PlayerManager : MonoBehaviour
         spriteRenderer.sprite = hammerSprite;
         mainmenu = FindAnyObjectByType<Mainmenu>();
         gameObject.SetActive(false);
+
+        // Ẩn thanh Armor khi bắt đầu game
+        armorPlayer.gameObject.SetActive(false);
     }
 
     void Update()
@@ -59,14 +67,34 @@ public class PlayerManager : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        health -= damage;
-        Debug.Log("Player health: " + health + " (" + playerName + ")");
-        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+        if (isArmorVisible && armor > 0)
+        {
+            // Trừ máu từ Armor trước
+            armor -= damage;
+            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+
+            // Nếu Armor hết thì ẩn thanh Armor
+            if (armor <= 0)
+            {
+                armor = 0;
+                armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+                armorPlayer.gameObject.SetActive(false);
+                isArmorVisible = false;
+            }
+        }
+        else
+        {
+            // Trừ máu từ Health khi không còn Armor
+            health -= damage;
+            healthPlayer.UpdatePlayerHealth(health, maxHealth);
+        }
+
         if (health <= 0)
         {
             Die();
         }
     }
+    
 
     void Die()
     {
@@ -79,7 +107,11 @@ public class PlayerManager : MonoBehaviour
     {
         // Reset health to maximum
         health = maxHealth;
+        
         healthPlayer.UpdatePlayerHealth(health, maxHealth); // Update UI
+        
+        armor = maxArmor;
+        armorPlayer.UpdatePlayerArmor(armor, maxArmor);
 
         // Reset position to starting point
         transform.position = Vector3.zero;
@@ -125,8 +157,23 @@ public class PlayerManager : MonoBehaviour
 {
     health = maxHealth;
     healthPlayer.UpdatePlayerHealth(health, maxHealth); // Cập nhật UI thanh máu
+    
     Debug.Log("Fully healed! Current health: " + health);
+
+    armor = maxArmor;
+    armorPlayer.UpdatePlayerArmor(armor, maxArmor); // Cập nhật UI thanh máu
+    Debug.Log("Fully healed! Current health: " + armor);
 }
 
-
+public void ToggleArmor()
+    {
+        if (!isArmorVisible)
+        {
+            // Khi click để bật Armor lên
+            armor = maxArmor;
+            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+            armorPlayer.gameObject.SetActive(true);
+            isArmorVisible = true;
+        }
+    }
 }

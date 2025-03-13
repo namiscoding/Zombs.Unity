@@ -10,6 +10,7 @@ public class HealthPlayer : MonoBehaviour
         health.value = currentValue / maxValue;
         health2.value = currentValue / maxValue;
     }
+    
 
     // Update is called once per frame
     void Update()
