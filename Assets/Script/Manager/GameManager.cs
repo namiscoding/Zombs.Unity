@@ -8,7 +8,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int stone;         // Số lượng đá hiện tại
     [SerializeField] private Text txtWood;      // Text UI hiển thị số lượng gỗ
     [SerializeField] private Text txtStone;     // Text UI hiển thị số lượng đá
-
     void Start()
     {
         UpdateResourceUI();

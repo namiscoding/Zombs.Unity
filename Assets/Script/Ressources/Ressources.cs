@@ -4,10 +4,10 @@ public class Ressources : MonoBehaviour
 {
     protected GameManager gameManager;
     private Rigidbody2D rb;
-    private Animator animator;
-    private ObjectPool objectPool;
-    [SerializeField] private float collectDuration = 0.01f;
-    private float collectEndTime = 0f;
+    protected Animator animator;
+    protected ObjectPool objectPool;
+    [SerializeField] protected float collectDuration = 0.1f;
+    protected float collectEndTime = 0f;
 
     void OnEnable()
     {
@@ -17,7 +17,7 @@ public class Ressources : MonoBehaviour
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = FindFirstObjectByType<GameManager>();
     }
 
     protected virtual void Start()
@@ -35,10 +35,10 @@ public class Ressources : MonoBehaviour
 
     public virtual void TakeDamage()
     {
-        if (animator != null)
-        {
-            animator.SetBool("isCollect", true);
-            collectEndTime = Time.time + collectDuration;
-        }
+        //if (animator != null)
+        //{
+        //    animator.SetBool("isCollect", true);
+        //    collectEndTime = Time.time + collectDuration;
+        //}
     }
 }

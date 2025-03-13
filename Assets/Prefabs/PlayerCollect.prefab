@@ -139,3 +139,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeDestroy: 0.3
   damage: 10
+  floatingTextPool: {fileID: 5544523334188436114, guid: dfe864da2cc74ee4db8307d341c13927, type: 3}

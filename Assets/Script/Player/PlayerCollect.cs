@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class PlayerCollect : MonoBehaviour
 {
@@ -16,13 +17,12 @@ public class PlayerCollect : MonoBehaviour
     }
     private void Awake()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = FindFirstObjectByType<GameManager>();
     }
     public void SetPool(ObjectPool pool)
     {
         objectPool = pool;
     }
-
     void Update()
     {
         if (Time.time > lifeTime)
@@ -41,14 +41,14 @@ public class PlayerCollect : MonoBehaviour
             Debug.Log("Damage resource");
             ressources.TakeDamage();
 
-            // Determine resource type and add correct amount
-            if (collision.CompareTag("Rock"))
+            switch (collision.tag)
             {
-                gameManager.AddStone(damage);
-            }
-            else if (collision.CompareTag("Tree"))
-            {
-                gameManager.AddWood(damage);
+                case "Rock":
+                    gameManager.AddStone(damage);
+                    break;
+                case "Tree":
+                    gameManager.AddWood(damage);
+                    break;
             }
 
             hasDealtDamage = true;
@@ -56,7 +56,6 @@ public class PlayerCollect : MonoBehaviour
             ReturnToPoolOrDestroy();
         }
     }
-
     private void ReturnToPoolOrDestroy()
     {
         if (objectPool != null)
