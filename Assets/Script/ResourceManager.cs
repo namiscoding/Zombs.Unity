@@ -4,9 +4,9 @@ public class ResourceManager : MonoBehaviour
 {
     public static ResourceManager Instance { get; private set; }
 
-    public int wood { get; private set; } = 100; // Starting values
-    public int rock { get; private set; } = 50;
-    public int gold { get; private set; } = 20;
+    public int wood { get; private set; } = 200; // Starting values
+    public int rock { get; private set; } = 200;
+    public int gold { get; private set; } = 200;
 
     void Awake()
     {

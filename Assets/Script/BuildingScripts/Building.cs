@@ -1,40 +1,37 @@
-using System.Resources;
 using UnityEngine;
 
-public class Tower : MonoBehaviour
+public abstract class Building : MonoBehaviour
 {
-    public TowerData data;
-    private int currentLevel = 1; // Starts at Level 1
-    private int currentHealth;
+    public BuildingData data;
+    protected int currentLevel = 1;
+    protected int currentHealth;
 
-    void Start()
+    protected virtual void Start()
     {
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = data.sprite;
         UpdateStats();
     }
 
-    public void LevelUp()
+    public virtual void LevelUp()
     {
-        if (currentLevel >= 5) return; // Max level reached
-
-        int nextLevelIndex = currentLevel - 1; // 0-based index for levelUpCosts
+        if (currentLevel >= 5 || currentLevel >= GameManager.Instance.CenterLevel) return;
+        int nextLevelIndex = currentLevel - 1;
         if (ResourceManager.Instance.CanAfford(data.levelUpCosts[nextLevelIndex]))
         {
             ResourceManager.Instance.SpendResources(data.levelUpCosts[nextLevelIndex]);
             currentLevel++;
             UpdateStats();
-            Debug.Log($"{data.towerName} leveled up to {currentLevel}");
+            Debug.Log($"{data.buildingName} leveled up to {currentLevel}");
         }
     }
 
-    private void UpdateStats()
+    protected virtual void UpdateStats()
     {
         currentHealth = (int)(data.maxHealth * data.healthMultipliers[currentLevel - 1]);
-        // Later: Apply damage, range to attack logic
     }
 
-    public void TakeDamage(int amount)
+    public virtual void TakeDamage(int amount)
     {
         currentHealth -= amount;
         if (currentHealth <= 0) Destroy(gameObject);

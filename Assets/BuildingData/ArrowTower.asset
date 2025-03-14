@@ -12,23 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ec920a73e629434d97a74619e3b19c9, type: 3}
   m_Name: ArrowTower
   m_EditorClassIdentifier: 
-  towerName: Arrow Tower
+  buildingName: Arrow Tower
   sprite: {fileID: -3036176032955394659, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
-  maxQuantity: 10
-  attackRange: 10
-  maxHealth: 50
-  attackSpeed: 2
-  damage: 10
+  maxQuantity: 12
+  maxHealth: 100
   baseCost:
     wood: 1
     rock: 1
     gold: 1
   levelUpCosts:
-  - wood: 2
-    rock: 2
-    gold: 2
+  - wood: 0
+    rock: 0
+    gold: 0
   healthMultipliers:
   - 2
+  attackRange: 10
+  attackSpeed: 1
+  damage: 10
   damageMultipliers:
   - 2
   rangeMultipliers:
