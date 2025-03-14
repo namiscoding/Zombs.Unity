@@ -6,62 +6,64 @@ public class EnemyNoWeapon : MonoBehaviour
     public enum EnemyType { Blue, Green, Red, Yellow }
     public EnemyType enemyType;
     public float speed;
+    public int maxHealth;
+    private int currentHealth;
+    public int attackDamage; // 💥 Sát thương khi tấn công
 
     public float stopDistance = 0.5f;
-
-    // Các thông số tấn công (cố định cho mọi loại Enemy)
-    private const float attackAmplitude = 15f;
-    private const float attackFrequency = 5f;
-    private const float attackDuration = 1f;
+    public float attackAmplitude = 15f;
+    public float attackFrequency = 5f;
+    public float attackDuration = 1f;
 
     private Transform player;
+    private PlayerHealth playerHealth;
     private Rigidbody2D rb;
     private bool isAttacking = false;
-    private Vector3 initialPosition;
     private float initialAngleZ;
-    public Transform armTransform; // Cánh tay của Enemy
+    private Vector3 initialPosition;
+
+    public Transform armTransform;
+    private Vector3 armLocalPosition;
 
     void Start()
     {
-        SetSpeedBasedOnType(); // Chỉ đặt tốc độ di chuyển, tốc độ đánh giữ nguyên
+        SetAttributesBasedOnType();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player != null)
+        {
+            playerHealth = player.GetComponent<PlayerHealth>();
+        }
+
         rb = GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
+
+        if (armTransform != null)
+            armLocalPosition = armTransform.localPosition;
+
+        currentHealth = maxHealth;
     }
+
     void Update()
     {
-        if (player != null && !isAttacking)
-        {
-            float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-            Vector2 direction = (player.position - transform.position).normalized;
-            RotateTowardsPlayer(direction);
+        if (player == null) return;
 
-            if (distanceToPlayer > stopDistance)
-            {
-                rb.MovePosition(rb.position + direction * speed * Time.deltaTime);
-            }
-            else
-            {
-                rb.linearVelocity = Vector2.zero;
-                if (!isAttacking)
-                {
-                    isAttacking = true;
-                    initialPosition = transform.position;
-                    initialAngleZ = transform.rotation.eulerAngles.z;
-                    StartCoroutine(AttackBehavior());
-                }
-            }
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        Vector2 direction = (player.position - transform.position).normalized;
+        RotateTowardsPlayer(direction);
+
+        if (distanceToPlayer > stopDistance && !isAttacking)
+        {
+            rb.MovePosition(rb.position + direction * speed * Time.deltaTime);
+        }
+        else if (!isAttacking)
+        {
+            isAttacking = true;
+            initialPosition = transform.position;
+            initialAngleZ = transform.rotation.eulerAngles.z;
+            StartCoroutine(AttackBehavior());
         }
 
-        // Luôn giữ cánh tay hướng về Player
-        if (armTransform != null && player != null)
-        {
-            Vector2 armDirection = (player.position - armTransform.position).normalized;
-            float armAngle = Mathf.Atan2(armDirection.y, armDirection.x) * Mathf.Rad2Deg;
-
-            // Đặt lại góc quay của cánh tay
-            armTransform.rotation = Quaternion.Euler(0f, 0f, armAngle);
-        }
+        FixArmPosition();
     }
 
     void RotateTowardsPlayer(Vector2 direction)
@@ -70,67 +72,76 @@ public class EnemyNoWeapon : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
-    void RotateArmTowardsPlayer()
+    void FixArmPosition()
     {
-        if (armTransform == null || player == null) return;
-
-        Vector2 direction = (player.position - transform.position).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-        // Giữ góc cánh tay độc lập với góc cơ thể
-        armTransform.rotation = Quaternion.Euler(0f, 0f, angle);
-    }
-
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            isAttacking = true;
-            initialPosition = transform.position;
-            initialAngleZ = transform.rotation.eulerAngles.z;
-            StartCoroutine(AttackBehavior());
-        }
-    }
-
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            isAttacking = false;
-        }
+        if (armTransform != null)
+            armTransform.localPosition = armLocalPosition;
     }
 
     IEnumerator AttackBehavior()
     {
         float elapsed = 0f;
-        while (isAttacking && elapsed < attackDuration)
+        while (elapsed < attackDuration)
         {
             elapsed += Time.deltaTime;
             float attackAngle = Mathf.Sin(elapsed * attackFrequency * Mathf.PI * 2) * attackAmplitude;
             transform.rotation = Quaternion.Euler(0f, 0f, initialAngleZ + attackAngle);
-            transform.position = initialPosition;
             yield return null;
         }
+
         transform.rotation = Quaternion.Euler(0f, 0f, initialAngleZ);
         isAttacking = false;
+
+        // 💥 Sau khi tấn công, gây damage lên Player
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(attackDamage);
+            Debug.Log($"{enemyType} gây {attackDamage} sát thương lên Player!");
+        }
     }
 
-    void SetSpeedBasedOnType()
+    void SetAttributesBasedOnType()
     {
         switch (enemyType)
         {
             case EnemyType.Blue:
                 speed = 3f;
+                maxHealth = 100;
+                attackDamage = 10;
                 break;
             case EnemyType.Green:
                 speed = 2f;
+                maxHealth = 120;
+                attackDamage = 15;
                 break;
             case EnemyType.Red:
                 speed = 6f;
+                maxHealth = 80;
+                attackDamage = 8;
                 break;
-            case EnemyType Yellow:
+            case EnemyType.Yellow:
                 speed = 4f;
+                maxHealth = 150;
+                attackDamage = 12;
                 break;
         }
+        currentHealth = maxHealth;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        Debug.Log($"{enemyType} nhận {damage} sát thương. Máu còn lại: {currentHealth}");
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log($"{enemyType} đã bị tiêu diệt!");
+        Destroy(gameObject);
     }
 }

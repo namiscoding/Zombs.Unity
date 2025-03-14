@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8004819110668514649}
   - component: {fileID: 3677515375598922129}
   - component: {fileID: 1209220752367809821}
+  - component: {fileID: 2896436391774353455}
   m_Layer: 7
   m_Name: arm
   m_TagString: Untagged
@@ -26,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1790888963734159680}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.017117118, y: 0.009323807, z: -0.55260706, w: 0.833214}
-  m_LocalPosition: {x: -0.375, y: 0.434, z: 0.017}
+  m_LocalRotation: {x: 0.0159564, y: 0.011194749, z: -0.6430494, w: 0.76557666}
+  m_LocalPosition: {x: -0.175, y: 0.382, z: 0.015}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5781299780525267901}
-  m_LocalEulerAnglesHint: {x: 2.225, y: -0.194, z: -67.11}
+  m_LocalEulerAnglesHint: {x: 2.225, y: -0.194, z: -80.061}
 --- !u!212 &3677515375598922129
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -118,7 +119,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -134,6 +135,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.65, y: 1.02}
   m_EdgeRadius: 0
+--- !u!114 &2896436391774353455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790888963734159680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f348f77e9bcd5f4c92f25ec71edd2b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponType: 3
+  baseDamage: 0
 --- !u!1 &3938446972081389565
 GameObject:
   m_ObjectHideFlags: 0
@@ -239,7 +254,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyType: 3
   speed: 0
+  maxHealth: 0
+  attackDamage: 0
   stopDistance: 1.5
+  attackAmplitude: 15
+  attackFrequency: 5
+  attackDuration: 1
   armTransform: {fileID: 8004819110668514649}
 --- !u!50 &8125065603709248213
 Rigidbody2D:
@@ -249,7 +269,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3938446972081389565}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -298,7 +318,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

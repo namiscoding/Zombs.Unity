@@ -256,7 +256,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -280,7 +280,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3886385910042731585}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -313,6 +313,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyType: 3
   speed: 0
+  maxHealth: 0
   stopDistance: 1.5
   attackAmplitude: 30
   attackFrequency: 1
@@ -330,6 +331,7 @@ GameObject:
   - component: {fileID: 2728394361431061992}
   - component: {fileID: 5402003156099570292}
   - component: {fileID: 1036157758300832490}
+  - component: {fileID: 7740262471395381041}
   m_Layer: 7
   m_Name: weapon
   m_TagString: weaponENemy
@@ -437,7 +439,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -453,3 +455,17 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.67, y: 1.26}
   m_EdgeRadius: 0
+--- !u!114 &7740262471395381041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6910493398847849321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f348f77e9bcd5f4c92f25ec71edd2b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponType: 1
+  baseDamage: 0
