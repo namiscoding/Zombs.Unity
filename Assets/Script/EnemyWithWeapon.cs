@@ -11,7 +11,7 @@ public class EnemyWithWeapon : MonoBehaviour
 
     public float stopDistance = 1.5f;
     public float attackAmplitude = 30f;
-    public float attackFrequency = 1f;
+    public float attackFrequency = 3f;
     public float attackDuration = 1f;
 
     private Transform player;

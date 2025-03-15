@@ -11,8 +11,8 @@ public class EnemyNoWeapon : MonoBehaviour
     public int attackDamage; // 💥 Sát thương khi tấn công
 
     public float stopDistance = 0.5f;
-    public float attackAmplitude = 15f;
-    public float attackFrequency = 5f;
+    public float attackAmplitude = 30f;
+    public float attackFrequency = 3f;
     public float attackDuration = 1f;
 
     private Transform player;
