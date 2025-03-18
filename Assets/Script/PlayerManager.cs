@@ -19,9 +19,12 @@ public class PlayerManager : MonoBehaviour
     private Vector3 mouseP;
     private SpriteRenderer spriteRenderer;
     private Mainmenu mainmenu;
-    public TextMeshProUGUI playerName; 
+    private ShopManager shopManager;
+    public TextMeshProUGUI playerName;
 
-    private bool isArmorVisible = false; // Ẩn thanh Armor khi bắt đầu game
+    public int gold;
+
+    private bool isArmorVisible = false;
 
     void Awake()
     {
@@ -31,6 +34,7 @@ public class PlayerManager : MonoBehaviour
 
     void Start()
     {
+        gold = 10000;
         m_Camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         if (m_Camera == null) Debug.LogError("Main Camera not found!");
         rb = GetComponent<Rigidbody2D>();
@@ -38,9 +42,14 @@ public class PlayerManager : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = hammerSprite;
         mainmenu = FindAnyObjectByType<Mainmenu>();
+        shopManager = FindAnyObjectByType<ShopManager>();
+        if (mainmenu == null) Debug.LogError("Mainmenu not found!");
+        if (shopManager == null)
+        {
+            Debug.LogWarning("ShopManager not found! Please add a ShopManager component to a GameObject in the scene.");
+        }
         gameObject.SetActive(false);
 
-        // Ẩn thanh Armor khi bắt đầu game
         armorPlayer.gameObject.SetActive(false);
     }
 
@@ -62,18 +71,16 @@ public class PlayerManager : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
-        Debug.Log("Move Input: " + moveInput); // Debug
+        Debug.Log("Move Input: " + moveInput);
     }
 
     public void TakeDamage(float damage)
     {
         if (isArmorVisible && armor > 0)
         {
-            // Trừ máu từ Armor trước
             armor -= damage;
             armorPlayer.UpdatePlayerArmor(armor, maxArmor);
 
-            // Nếu Armor hết thì ẩn thanh Armor
             if (armor <= 0)
             {
                 armor = 0;
@@ -84,7 +91,6 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            // Trừ máu từ Health khi không còn Armor
             health -= damage;
             healthPlayer.UpdatePlayerHealth(health, maxHealth);
         }
@@ -94,82 +100,84 @@ public class PlayerManager : MonoBehaviour
             Die();
         }
     }
-    
 
     void Die()
     {
         Time.timeScale = 0;
-        gameObject.SetActive(false); // Hide instead of destroy
-        mainmenu.Revive();
+        gameObject.SetActive(false);
+        if (mainmenu != null) mainmenu.Revive();
     }
 
     public void Revive()
     {
-        // Reset health to maximum
         health = maxHealth;
-        
-        healthPlayer.UpdatePlayerHealth(health, maxHealth); // Update UI
-        
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+
         armor = maxArmor;
         armorPlayer.UpdatePlayerArmor(armor, maxArmor);
 
-        // Reset position to starting point
         transform.position = Vector3.zero;
-
-        // Reset rotation
         transform.rotation = Quaternion.identity;
-
-        // Ensure the GameObject is active
         gameObject.SetActive(true);
-
-        // Resume game time
         Time.timeScale = 1;
 
-        // Reset velocity
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-        }
-
-        // Reset to default sprite (hammer)
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.sprite = hammerSprite;
-        }
-        mainmenu.startGame(); // This might be a mistake - consider removing or adjusting logic
-        Debug.Log("Player Revived: " + playerName);
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite;
+        if (mainmenu != null) mainmenu.startGame();
+        Debug.Log("Player Revived: " + playerName?.text);
     }
 
-    public void ChangeToHammer() { spriteRenderer.sprite = hammerSprite; }
-    public void ChangeToSword() { spriteRenderer.sprite = swordSprite; }
-    public void ChangeToBow() { spriteRenderer.sprite = bowSprite; }
+    public void ChangeToHammer() { if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite; }
+    public void ChangeToSword() { if (spriteRenderer != null) spriteRenderer.sprite = swordSprite; }
+    public void ChangeToBow() { if (spriteRenderer != null) spriteRenderer.sprite = bowSprite; }
 
-    // New method to set the player name
     public void SetPlayerName(string name)
     {
-        playerName.text = name;
-        Debug.Log("Player name set to: " + playerName);
-        // You could also update a UI element here if you have a name display
+        if (playerName != null) playerName.text = name;
+        Debug.Log("Player name set to: " + playerName?.text);
     }
 
-    //Phương thức hồi Full máu
     public void FullHeal()
-{
-    health = maxHealth;
-    healthPlayer.UpdatePlayerHealth(health, maxHealth); // Cập nhật UI thanh máu
-    
-    Debug.Log("Fully healed! Current health: " + health);
+    {
+        health = maxHealth;
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+        Debug.Log("Fully healed! Current health: " + health);
 
-    armor = maxArmor;
-    armorPlayer.UpdatePlayerArmor(armor, maxArmor); // Cập nhật UI thanh máu
-    Debug.Log("Fully healed! Current health: " + armor);
-}
+        armor = maxArmor;
+        armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+        Debug.Log("Fully healed! Current armor: " + armor);
+    }
 
-public void ToggleArmor()
+    public void ToggleUtility()
+    {
+        if (mainmenu == null)
+        {
+            Debug.LogError("Mainmenu not found!");
+            return;
+        }
+
+        if (!mainmenu.Utility.activeSelf)
+        {
+            mainmenu.BuyUtility();
+            if (shopManager != null)
+            {
+                shopManager.PurchaseHealthPotion();
+            }
+            else
+            {
+                Debug.LogWarning("ShopManager not found! Cannot purchase health potion.");
+            }
+        }
+        else
+        {
+            Debug.Log("Utility is already active, no need to buy again.");
+        }
+    }
+
+    public void ToggleArmor()
     {
         if (!isArmorVisible)
         {
-            // Khi click để bật Armor lên
             armor = maxArmor;
             armorPlayer.UpdatePlayerArmor(armor, maxArmor);
             armorPlayer.gameObject.SetActive(true);
