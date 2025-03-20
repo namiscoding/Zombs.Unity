@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0449f00d9bf518c4b8031b2c516a6a57, type: 3}
+  m_Name: Wall
+  m_EditorClassIdentifier: 
+  buildingName: Wall
+  sprite: {fileID: -6470460504253458178, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  maxQuantity: 100
+  maxHealth: 50
+  baseCost:
+    wood: 1
+    rock: 1
+    gold: 1
+  levelUpCosts:
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
+  healthMultipliers:
+  - 1
+  - 1.5
+  - 2
+  - 2.5
+  - 3
+  isDoor: 0
