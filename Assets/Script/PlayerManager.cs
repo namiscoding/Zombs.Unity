@@ -1,4 +1,5 @@
-using TMPro;
+﻿using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,11 +8,13 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float speed = 5.0f;
     [SerializeField] private float health, maxHealth = 10;
     [SerializeField] private HealthPlayer healthPlayer;
-    [SerializeField] private float armor, maxArmor = 10;
+    [SerializeField] private float armor, maxArmor = 0;
     [SerializeField] private ArmorPlayer armorPlayer;
     [SerializeField] private Sprite hammerSprite;
-    [SerializeField] private Sprite swordSprite;
     [SerializeField] private Sprite bowSprite;
+    [SerializeField] private GameObject changeToSwordPanel;
+    [SerializeField] private GameObject changeToBowPanel;
+    [SerializeField] private GameObject changeToAxePanel;
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -20,6 +23,11 @@ public class PlayerManager : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Mainmenu mainmenu;
     private ShopManager shopManager;
+    private AmorManager amorManager;
+    private WP_SwordManager swordManager;
+    private WP_BowManager bowManager;
+    private WP_AxeManager axeManager;
+
     public TextMeshProUGUI playerName;
 
     public int gold;
@@ -41,16 +49,23 @@ public class PlayerManager : MonoBehaviour
         if (rb == null) Debug.LogError("Rigidbody2D is missing!");
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = hammerSprite;
-        mainmenu = FindAnyObjectByType<Mainmenu>();
-        shopManager = FindAnyObjectByType<ShopManager>();
+        mainmenu = FindFirstObjectByType<Mainmenu>();
+        shopManager = FindFirstObjectByType<ShopManager>();
+        amorManager = FindFirstObjectByType<AmorManager>();
+        swordManager = FindFirstObjectByType<WP_SwordManager>();
+        bowManager = FindFirstObjectByType<WP_BowManager>();
+        axeManager = FindFirstObjectByType<WP_AxeManager>();
         if (mainmenu == null) Debug.LogError("Mainmenu not found!");
-        if (shopManager == null)
-        {
-            Debug.LogWarning("ShopManager not found! Please add a ShopManager component to a GameObject in the scene.");
-        }
+        if (shopManager == null) Debug.LogError("ShopManager not found!");
+        if (amorManager == null) Debug.LogError("AmorManager not found!");
+        if (swordManager == null) Debug.LogError("WP_SwordManager not found!");
+        if (bowManager == null) Debug.LogError("WP_BowManager not found!");
+        if (axeManager == null) Debug.LogError("WP_AxeManager not found!");
         gameObject.SetActive(false);
-
-        armorPlayer.gameObject.SetActive(false);
+        changeToSwordPanel.SetActive(false);
+        changeToBowPanel.SetActive(false);
+        changeToAxePanel.SetActive(true);
+        SyncWithAmorManager();
     }
 
     void Update()
@@ -71,20 +86,22 @@ public class PlayerManager : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
-        Debug.Log("Move Input: " + moveInput);
     }
 
     public void TakeDamage(float damage)
     {
-        if (isArmorVisible && armor > 0)
+        float reducedDamage = damage;
+        if (amorManager != null && amorManager.GetMaxArmor() > 0 && amorManager.GetCurrentArmor() > 0)
         {
-            armor -= damage;
+            float damageReduction = amorManager.GetDamageReduction();
+            reducedDamage = damage * (1f - damageReduction);
+            amorManager.TakeDamage(reducedDamage);
+            armor = amorManager.GetCurrentArmor();
+            maxArmor = amorManager.GetMaxArmor();
             armorPlayer.UpdatePlayerArmor(armor, maxArmor);
 
             if (armor <= 0)
             {
-                armor = 0;
-                armorPlayer.UpdatePlayerArmor(armor, maxArmor);
                 armorPlayer.gameObject.SetActive(false);
                 isArmorVisible = false;
             }
@@ -113,7 +130,16 @@ public class PlayerManager : MonoBehaviour
         health = maxHealth;
         healthPlayer.UpdatePlayerHealth(health, maxHealth);
 
-        armor = maxArmor;
+        if (amorManager != null)
+        {
+            amorManager.ResetArmor();
+            armor = amorManager.GetCurrentArmor();
+            maxArmor = amorManager.GetMaxArmor();
+        }
+        else
+        {
+            armor = maxArmor;
+        }
         armorPlayer.UpdatePlayerArmor(armor, maxArmor);
 
         transform.position = Vector3.zero;
@@ -124,28 +150,61 @@ public class PlayerManager : MonoBehaviour
         if (rb != null) rb.linearVelocity = Vector2.zero;
         if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite;
         if (mainmenu != null) mainmenu.startGame();
-        Debug.Log("Player Revived: " + playerName?.text);
     }
 
-    public void ChangeToHammer() { if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite; }
-    public void ChangeToSword() { if (spriteRenderer != null) spriteRenderer.sprite = swordSprite; }
-    public void ChangeToBow() { if (spriteRenderer != null) spriteRenderer.sprite = bowSprite; }
+    public void ChangeToHammer()
+    {
+        if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite;
+    }
+
+    public void ChangeToSword()
+    {
+        if (spriteRenderer != null && swordManager != null)
+        {
+            spriteRenderer.sprite = swordManager.GetCurrentSwordSprite();
+            Debug.Log("Changed to sword sprite: " + spriteRenderer.sprite.name);
+        }
+    }
+
+    public void ChangeToBow()
+    {
+        if (spriteRenderer != null && bowManager != null)
+        {
+            spriteRenderer.sprite = bowManager.GetCurrentBowSprite();
+            Debug.Log("Changed to bow sprite: " + spriteRenderer.sprite.name);
+        }
+    }
+
+    public void ChangeToAxe()
+    {
+        if (spriteRenderer != null && axeManager != null)
+        {
+            spriteRenderer.sprite = axeManager.GetCurrentAxeSprite();
+            Debug.Log("Changed to axe sprite: " + spriteRenderer.sprite.name);
+        }
+    }
 
     public void SetPlayerName(string name)
     {
         if (playerName != null) playerName.text = name;
-        Debug.Log("Player name set to: " + playerName?.text);
     }
 
     public void FullHeal()
     {
         health = maxHealth;
         healthPlayer.UpdatePlayerHealth(health, maxHealth);
-        Debug.Log("Fully healed! Current health: " + health);
 
-        armor = maxArmor;
+        if (amorManager != null)
+        {
+            amorManager.SetCurrentArmor(amorManager.GetMaxArmor());
+            armor = amorManager.GetCurrentArmor();
+            maxArmor = amorManager.GetMaxArmor();
+        }
+        else
+        {
+            armor = maxArmor;
+        }
         armorPlayer.UpdatePlayerArmor(armor, maxArmor);
-        Debug.Log("Fully healed! Current armor: " + armor);
     }
 
     public void ToggleUtility()
@@ -176,12 +235,121 @@ public class PlayerManager : MonoBehaviour
 
     public void ToggleArmor()
     {
-        if (!isArmorVisible)
+        if (amorManager != null)
         {
-            armor = maxArmor;
+            armor = amorManager.GetCurrentArmor();
+            maxArmor = amorManager.GetMaxArmor();
+            if (maxArmor > 0)
+            {
+                if (armorPlayer != null)
+                {
+                    armorPlayer.gameObject.SetActive(true);
+                    isArmorVisible = true;
+                    armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+                }
+                else
+                {
+                    Debug.LogError("armorPlayer not assigned in Inspector!");
+                }
+            }
+            else
+            {
+                if (armorPlayer != null)
+                {
+                    armorPlayer.gameObject.SetActive(false);
+                    isArmorVisible = false;
+                }
+            }
+        }
+    }
+
+    public void SyncWithAmorManager()
+    {
+        if (amorManager != null)
+        {
+            maxArmor = amorManager.GetMaxArmor();
+            armor = amorManager.GetCurrentArmor();
+            float previousMaxHealth = maxHealth;
+            maxHealth = 10 + amorManager.GetMaxHealthBonus();
+            health += maxHealth - previousMaxHealth;
+            healthPlayer.UpdatePlayerHealth(health, maxHealth);
             armorPlayer.UpdatePlayerArmor(armor, maxArmor);
-            armorPlayer.gameObject.SetActive(true);
-            isArmorVisible = true;
+            if (maxArmor > 0 && armor > 0)
+            {
+                isArmorVisible = true;
+                armorPlayer.gameObject.SetActive(true);
+            }
+            else
+            {
+                isArmorVisible = false;
+                armorPlayer.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void ToggleSword()
+    {
+        if (changeToSwordPanel != null && swordManager != null)
+        {
+            changeToSwordPanel.SetActive(true);
+            var swordImage = changeToSwordPanel.GetComponent<UnityEngine.UI.Image>();
+            if (swordImage != null)
+            {
+                swordImage.sprite = swordManager.GetCurrentSwordSpriteWP();
+                Debug.Log("Sword UI updated with sprite: " + swordImage.sprite.name);
+            }
+            else
+            {
+                Debug.LogWarning("Sword Image component not found on changeToSwordPanel!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("changeToSwordPanel or swordManager is not assigned!");
+        }
+    }
+
+    public void ToggleBow()
+    {
+        if (changeToBowPanel != null && bowManager != null)
+        {
+            changeToBowPanel.SetActive(true);
+            var bowImage = changeToBowPanel.GetComponent<UnityEngine.UI.Image>();
+            if (bowImage != null)
+            {
+                bowImage.sprite = bowManager.GetCurrentBowSpriteWP();
+                Debug.Log("Bow UI updated with sprite: " + bowImage.sprite.name);
+            }
+            else
+            {
+                Debug.LogError("Bow Image component not found on changeToBowPanel!");
+            }
+        }
+        else
+        {
+            Debug.LogError("changeToBowPanel or bowManager is not assigned!");
+        }
+    }
+
+    public void ToggleAxe()
+    {
+        if (changeToAxePanel != null && axeManager != null)
+        {
+            changeToAxePanel.SetActive(true);
+            var axeImage = changeToAxePanel.GetComponent<UnityEngine.UI.Image>();
+            if (axeImage != null)
+            {
+                axeImage.sprite = axeManager.GetCurrentAxeSpriteWP();
+                Debug.Log("Axe UI updated with sprite: " + axeImage.sprite.name);
+            }
+            else
+            {
+                Debug.LogError("Axe Image component not found on changeToAxePanel!");
+            }
+        }
+        else
+        {
+            Debug.LogError("changeToAxePanel or axeManager is not assigned!");
         }
     }
 }

@@ -39,8 +39,8 @@ public class Mainmenu : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("PlayerManager not found in Start! Defaulting gold to 10000.");
             SetNoGold(10000);
+            Debug.LogWarning("PlayerManager not found at Start, setting default gold.");
         }
     }
 
@@ -88,19 +88,20 @@ public class Mainmenu : MonoBehaviour
         Debug.Log("Using Health Potion...");
         if (Utility != null) Utility.SetActive(false);
 
-       
         if (playerManager == null)
         {
+            Debug.LogError("playerManager is null! Attempting to find it...");
             playerManager = FindAnyObjectByType<PlayerManager>();
             if (playerManager == null)
             {
-                Debug.LogError("playerManager not found in UserUtility!");
+                Debug.LogError("PlayerManager still not found in scene!");
                 return;
             }
         }
 
+        Debug.Log("Calling FullHeal on playerManager...");
         playerManager.FullHeal();
-        Debug.Log("Player healed after using potion!");
+        Debug.Log("SOS - FullHeal called successfully");
         Debug.Log("Health Potion Panel active: " + (Utility != null ? Utility.activeSelf : "null"));
     }
 
@@ -121,16 +122,17 @@ public class Mainmenu : MonoBehaviour
         string playerName = playerNameInput != null ? playerNameInput.text : "Player";
         if (string.IsNullOrEmpty(playerName)) playerName = "Player";
 
-        PlayerManager playerManager = FindAnyObjectByType<PlayerManager>();
-        if (playerManager != null)
+        if (playerManager == null)
         {
-            playerManager.SetPlayerName(playerName);
-        }
-        else
-        {
-            Debug.LogError("PlayerManager not found!");
+            playerManager = FindAnyObjectByType<PlayerManager>();
+            if (playerManager == null)
+            {
+                Debug.LogError("PlayerManager not found during startGame!");
+                return;
+            }
         }
 
+        playerManager.SetPlayerName(playerName);
         if (revivePanel != null) revivePanel.SetActive(false);
         if (startGamePanel != null) startGamePanel.SetActive(false);
         Time.timeScale = 1;
