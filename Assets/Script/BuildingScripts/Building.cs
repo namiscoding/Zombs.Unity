@@ -51,7 +51,7 @@ public abstract class Building : MonoBehaviour
 
     private void UpdatePanelIfDisplayed()
     {
-        BuildingInfoPanel panel = FindObjectOfType<BuildingInfoPanel>();
+        BuildingInfoPanel panel = FindFirstObjectByType<BuildingInfoPanel>();
         if (panel != null && panel.currentBuilding == this)
         {
             panel.UpdatePanel();

@@ -207,7 +207,7 @@ public class BuildingManager : MonoBehaviour
                 {
                     lastClickedCenter = building as Center;
                 }
-                BuildingInfoPanel panel = FindObjectOfType<BuildingInfoPanel>();
+                BuildingInfoPanel panel = FindFirstObjectByType<BuildingInfoPanel>();
                 if (panel != null)
                 {
                     Debug.Log($"HandleOutsideClick: Calling ShowPanel for building: {building}");
@@ -221,7 +221,7 @@ public class BuildingManager : MonoBehaviour
         {
             lastClickedCenter.HideRangeVisual();
         }
-        BuildingInfoPanel panelInstance = FindObjectOfType<BuildingInfoPanel>();
+        BuildingInfoPanel panelInstance = FindFirstObjectByType<BuildingInfoPanel>();
         if (panelInstance != null && panelInstance.panel.activeSelf)
         {
             panelInstance.HidePanel();

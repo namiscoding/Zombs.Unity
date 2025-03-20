@@ -14,7 +14,7 @@ public abstract class BuildingData : ScriptableObject
     public struct ResourceCost
     {
         public int wood;
-        public int rock;
+        public int stone;
         public int gold;
     }
 }

@@ -11,6 +11,7 @@ public class BuildingInfoPanel : MonoBehaviour
     public GameObject panel; // References PanelContent
     [HideInInspector]
     public Building currentBuilding;
+    [HideInInspector]
     public Camera mainCamera; // Assign the actual Camera in the Inspector
 
     private RectTransform panelRectTransform;
@@ -130,7 +131,7 @@ public class BuildingInfoPanel : MonoBehaviour
     void LateUpdate()
     {
         // Lock the position to prevent unexpected changes
-        if (lockPosition && panel.activeSelf && panelRectTransform.anchoredPosition != lastSetPosition)
+        if (lockPosition)
         {
             Debug.LogWarning($"Panel position changed unexpectedly! Current: {panelRectTransform.anchoredPosition}, Last set: {lastSetPosition}. Reverting to last set position.");
             panelRectTransform.anchoredPosition = lastSetPosition;
@@ -202,7 +203,7 @@ public class BuildingInfoPanel : MonoBehaviour
         if (nextLevel <= 5)
         {
             BuildingData.ResourceCost upgradeCost = currentBuilding.data.levelUpCosts[nextLevel - 2];
-            string upgradeCostText = $"Upgrade ({upgradeCost.wood} wood, {upgradeCost.rock} stone, {upgradeCost.gold} gold)";
+            string upgradeCostText = $"Upgrade ({upgradeCost.wood} wood, {upgradeCost.stone} stone, {upgradeCost.gold} gold)";
             upgradeButton.GetComponentInChildren<TextMeshProUGUI>().text = upgradeCostText;
 
             bool canAfford = ResourceManager.Instance.CanAfford(upgradeCost) && (currentBuilding.data is CenterData || nextLevel <= GameManager.Instance.CenterLevel);
@@ -214,8 +215,8 @@ public class BuildingInfoPanel : MonoBehaviour
             upgradeButton.interactable = false;
         }
 
-        BuildingData.ResourceCost sellCost = new BuildingData.ResourceCost { wood = 2, rock = 2, gold = 0 };
-        sellButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Sell ({sellCost.wood} wood, {sellCost.rock} stone)";
+        BuildingData.ResourceCost sellCost = new BuildingData.ResourceCost { wood = 2, stone = 2, gold = 0 };
+        sellButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Sell ({sellCost.wood} wood, {sellCost.stone} stone)";
     }
 
     private float GetStatValue(float baseValue, float[] multipliers)
@@ -238,8 +239,8 @@ public class BuildingInfoPanel : MonoBehaviour
     {
         if (currentBuilding != null)
         {
-            BuildingData.ResourceCost sellCost = new BuildingData.ResourceCost { wood = 2, rock = 2, gold = 0 };
-            ResourceManager.Instance.AddResources(sellCost.wood, sellCost.rock, sellCost.gold);
+            BuildingData.ResourceCost sellCost = new BuildingData.ResourceCost { wood = 2, stone = 2, gold = 0 };
+            ResourceManager.Instance.AddResources(sellCost.wood, sellCost.stone, sellCost.gold);
             Destroy(currentBuilding.gameObject);
             HidePanel();
         }

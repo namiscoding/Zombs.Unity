@@ -8,7 +8,6 @@ public class PlayerCollect : MonoBehaviour
     private ObjectPool objectPool;
     private float lifeTime;
     private bool hasDealtDamage = false;
-    protected GameManager gameManager;
     void OnEnable()
     {
         lifeTime = Time.time + timeDestroy;
@@ -17,7 +16,7 @@ public class PlayerCollect : MonoBehaviour
     }
     private void Awake()
     {
-        gameManager = FindFirstObjectByType<GameManager>();
+
     }
     public void SetPool(ObjectPool pool)
     {
@@ -44,10 +43,10 @@ public class PlayerCollect : MonoBehaviour
             switch (collision.tag)
             {
                 case "Rock":
-                    gameManager.AddStone(damage);
+                    ResourceManager.Instance.AddStone(damage);
                     break;
                 case "Tree":
-                    gameManager.AddWood(damage);
+                    ResourceManager.Instance.AddWood(damage);
                     break;
             }
 

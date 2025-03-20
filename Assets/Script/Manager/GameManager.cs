@@ -1,37 +1,31 @@
-﻿
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private int wood;          // Số lượng gỗ hiện tại
-    [SerializeField] private int stone;         // Số lượng đá hiện tại
-    [SerializeField] private Text txtWood;      // Text UI hiển thị số lượng gỗ
-    [SerializeField] private Text txtStone;     // Text UI hiển thị số lượng đá
-    void Start()
+    public static GameManager Instance { get; private set; }
+    private Center center;
+    public int CenterLevel => center != null ? center.GetLevel() : 0;
+    public bool HasCenter => center != null;
+
+    void Awake()
     {
-        UpdateResourceUI();
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
-    void UpdateResourceUI()
+    public void SetCenter(Center centerInstance)
     {
-        txtWood.text = "" + wood;
-        txtStone.text = "" + stone;
-        //txtWood.text = "Wood: " + wood;
-        //txtStone.text = "Stone: " + stone;
+        if (center == null)
+        {
+            center = centerInstance;
+            // Trigger enemy spawning here
+            Debug.Log("Center built, enemies triggered!");
+        }
     }
 
-    // Thêm đá
-    public void AddStone(int quality)
+    public void GameOver()
     {
-        stone += quality;      // Cộng số lượng đá
-        UpdateResourceUI();    // Cập nhật lại UI
-    }
-
-    // Thêm gỗ
-    public void AddWood(int quality)
-    {
-        wood += quality;       // Cộng số lượng gỗ
-        UpdateResourceUI();    // Cập nhật lại UI
+        Debug.Log("Game Over! Center destroyed.");
+        // Implement game over logic (e.g., scene reload)
     }
 }
