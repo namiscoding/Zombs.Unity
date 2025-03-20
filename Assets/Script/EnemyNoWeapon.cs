@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class EnemyNoWeapon : MonoBehaviour
 {
@@ -24,7 +25,8 @@ public class EnemyNoWeapon : MonoBehaviour
 
     public Transform armTransform;
     private Vector3 armLocalPosition;
-
+    public Slider healthBar;
+    private Image healthBarFill;
     void Start()
     {
         SetAttributesBasedOnType();
@@ -41,6 +43,13 @@ public class EnemyNoWeapon : MonoBehaviour
             armLocalPosition = armTransform.localPosition;
 
         currentHealth = maxHealth;
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = maxHealth;
+            healthBarFill = healthBar.fillRect.GetComponent<Image>(); // Lấy `Image` của Fill
+            healthBarFill.color = Color.green; // 💚 Ban đầu màu xanh lá
+        }
     }
 
     void Update()
@@ -116,7 +125,7 @@ public class EnemyNoWeapon : MonoBehaviour
                 break;
             case EnemyType.Red:
                 speed = 6f;
-                maxHealth = 80;
+                maxHealth = 200;
                 attackDamage = 8;
                 break;
             case EnemyType.Yellow:
@@ -128,16 +137,37 @@ public class EnemyNoWeapon : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-        Debug.Log($"{enemyType} nhận {damage} sát thương. Máu còn lại: {currentHealth}");
+ public void TakeDamage(int damage)
+{
+    currentHealth -= damage;
+    if (currentHealth > maxHealth) currentHealth = maxHealth;
+    if (currentHealth < 0) currentHealth = 0;
+    Debug.Log($"{enemyType} nhận {damage} sát thương. Máu còn lại: {currentHealth}");
 
+    if (healthBar != null)
+    {
+        healthBar.value = currentHealth;
+
+        if (healthBarFill != null)
+        {
+            if (currentHealth > maxHealth * 0.6f)
+                healthBarFill.color = Color.green; // 💚
+            else if (currentHealth > maxHealth * 0.3f)
+                healthBarFill.color = Color.yellow; // 💛
+            else
+                healthBarFill.color = Color.red; // ❤️
+        }
+
+        // Không ẩn thanh máu nếu không cần thiết
         if (currentHealth <= 0)
         {
+            // Nếu muốn ẩn thanh máu khi chết
+            healthBar.gameObject.SetActive(false); 
             Die();
         }
     }
+}
+
 
     void Die()
     {
