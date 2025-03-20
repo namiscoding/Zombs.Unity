@@ -20,7 +20,26 @@ MonoBehaviour:
     wood: 1
     rock: 1
     gold: 1
-  levelUpCosts: []
+  levelUpCosts:
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
+  - wood: 2
+    rock: 2
+    gold: 2
   healthMultipliers:
+  - 1
+  - 1.5
   - 2
+  - 2.5
+  - 3
   isDoor: 1

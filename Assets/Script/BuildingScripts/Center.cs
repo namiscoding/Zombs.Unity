@@ -12,19 +12,24 @@ public class Center : Building
         base.Start();
         GameManager.Instance.SetCenter(this);
         InitializeRangeVisual();
+        Debug.Log($"Center Start: Initial currentRange = {currentRange}");
     }
 
     protected override void UpdateStats()
     {
         base.UpdateStats();
         CenterData centerData = (CenterData)data;
+        Debug.Log($"UpdateStats: centerData = {centerData}, baseRange = {centerData.baseRange}, currentLevel = {currentLevel}");
         if (centerData.rangeMultipliers == null || centerData.rangeMultipliers.Length < currentLevel)
         {
             Debug.LogError($"{data.buildingName} has invalid rangeMultipliers array! Expected size >= {currentLevel}, got {centerData.rangeMultipliers?.Length ?? 0}");
             currentRange = centerData.baseRange;
+            Debug.Log($"Fallback: currentRange set to baseRange = {currentRange}");
             return;
         }
-        currentRange = centerData.baseRange * centerData.rangeMultipliers[currentLevel - 1];
+        float multiplier = centerData.rangeMultipliers[currentLevel - 1];
+        currentRange = centerData.baseRange * multiplier;
+        Debug.Log($"Level {currentLevel}: baseRange = {centerData.baseRange}, multiplier = {multiplier}, currentRange = {currentRange}");
         UpdateRangeVisual();
     }
 
@@ -36,13 +41,11 @@ public class Center : Building
 
     private void InitializeRangeVisual()
     {
-        // Create parent object
         rangeVisual = new GameObject("RangeVisual");
         rangeVisual.transform.SetParent(transform);
         rangeVisual.transform.localPosition = Vector3.zero;
         rangeVisual.SetActive(false);
 
-        // LineRenderer for border
         rangeBorder = rangeVisual.AddComponent<LineRenderer>();
         rangeBorder.positionCount = 5;
         rangeBorder.startWidth = 0.1f;
@@ -53,17 +56,15 @@ public class Center : Building
         rangeBorder.sortingLayerName = "Items";
         rangeBorder.sortingOrder = 2;
 
-        // Create fill with SpriteRenderer and dynamic sprite
         GameObject fillObject = new GameObject("RangeFill");
         fillObject.transform.SetParent(rangeVisual.transform);
         fillObject.transform.localPosition = Vector3.zero;
         rangeFill = fillObject.AddComponent<SpriteRenderer>();
 
-        // Create a 1x1 white sprite dynamically
         Texture2D fillTexture = new Texture2D(1, 1);
         fillTexture.SetPixel(0, 0, Color.white);
         fillTexture.Apply();
-        rangeFill.sprite = Sprite.Create(fillTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 100f); // Pivot at center, 100 pixels per unit
+        rangeFill.sprite = Sprite.Create(fillTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 100f);
         rangeFill.color = new Color(1, 1, 1, 0.2f);
         rangeFill.sortingLayerName = "Items";
         rangeFill.sortingOrder = 1;
@@ -77,6 +78,7 @@ public class Center : Building
 
         float size = currentRange * 2f;
         rangeFill.transform.localScale = new Vector3(size, size, 1f);
+        Debug.Log($"UpdateRangeVisual: currentRange = {currentRange}, size = {size}, rangeFill localScale = {rangeFill.transform.localScale}");
 
         Vector3 halfSize = new Vector3(currentRange, currentRange, 0);
         rangeBorder.SetPosition(0, transform.position - halfSize);

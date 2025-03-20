@@ -200,18 +200,31 @@ public class BuildingManager : MonoBehaviour
 
         if (hit.collider != null)
         {
-            Center center = hit.collider.GetComponent<Center>();
-            if (center != null)
+            Building building = hit.collider.GetComponent<Building>();
+            if (building != null)
             {
-                lastClickedCenter = center; // Update last clicked Center
-                return; // Let Center handle its own toggle
+                if (building is Center)
+                {
+                    lastClickedCenter = building as Center;
+                }
+                BuildingInfoPanel panel = FindObjectOfType<BuildingInfoPanel>();
+                if (panel != null)
+                {
+                    Debug.Log($"HandleOutsideClick: Calling ShowPanel for building: {building}");
+                    panel.ShowPanel(building);
+                }
+                return;
             }
         }
 
-        // Clicked outside, hide range if visible
         if (lastClickedCenter != null)
         {
             lastClickedCenter.HideRangeVisual();
+        }
+        BuildingInfoPanel panelInstance = FindObjectOfType<BuildingInfoPanel>();
+        if (panelInstance != null && panelInstance.panel.activeSelf)
+        {
+            panelInstance.HidePanel();
         }
     }
 

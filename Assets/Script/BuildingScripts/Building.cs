@@ -4,7 +4,7 @@ public abstract class Building : MonoBehaviour
 {
     public BuildingData data;
     protected int currentLevel = 1;
-    protected int currentHealth;
+    public int currentHealth;
 
     protected virtual void Start()
     {
@@ -35,6 +35,27 @@ public abstract class Building : MonoBehaviour
     {
         currentHealth -= amount;
         if (currentHealth <= 0) Destroy(gameObject);
+    }
+
+    void OnMouseDown()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            BuildingInfoPanel panel = FindFirstObjectByType<BuildingInfoPanel>();
+            if (panel != null)
+            {
+                panel.ShowPanel(this);
+            }
+        }
+    }
+
+    private void UpdatePanelIfDisplayed()
+    {
+        BuildingInfoPanel panel = FindObjectOfType<BuildingInfoPanel>();
+        if (panel != null && panel.currentBuilding == this)
+        {
+            panel.UpdatePanel();
+        }
     }
 
     public int GetLevel() => currentLevel;
