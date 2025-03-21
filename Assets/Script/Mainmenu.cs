@@ -7,13 +7,14 @@ public class Mainmenu : MonoBehaviour
     public GameObject startGamePanel;
     public TMP_InputField playerNameInput; // Reference to the InputField
     public GameObject ShopPanel;
-
+    private GameManager gameManager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         revivePanel.SetActive(false);
         startGamePanel.SetActive(true);
         ShopPanel.SetActive(false);
+        gameManager = FindAnyObjectByType<GameManager>();
         // Automatically find the InputField if not assigned in Inspector
         if (playerNameInput == null)
         {
@@ -59,7 +60,15 @@ public class Mainmenu : MonoBehaviour
         {
             Debug.LogError("PlayerManager not found!");
         }
-
+        if (gameManager != null)
+        {
+            gameManager.StartNightCycle();
+            gameManager.StartTimeBar();
+        }
+        else
+        {
+            Debug.LogError("GameManager not found!");
+        }
         revivePanel.SetActive(false); // Hide revive panel
         startGamePanel.SetActive(false); // Hide start panel
         Time.timeScale = 1; // Resume game
