@@ -3,7 +3,7 @@ using UnityEngine;
 public abstract class BuildingData : ScriptableObject
 {
     public string buildingName;
-    public Sprite sprite;
+    public Sprite[] sprites = new Sprite[6];
     public int maxQuantity;
     public int maxHealth;
     public ResourceCost baseCost;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 public class BuildingManager : MonoBehaviour
@@ -10,6 +11,7 @@ public class BuildingManager : MonoBehaviour
     private Dictionary<string, int> buildingCounts = new Dictionary<string, int>();
     private Dictionary<BuildingData, int> prefabIndices = new Dictionary<BuildingData, int>();
     private Center lastClickedCenter = null; // Track the last clicked Center
+    private Building lastClickedBuilding;
 
     void Start()
     {
@@ -19,14 +21,19 @@ public class BuildingManager : MonoBehaviour
             Debug.LogError("No Main Camera found!");
             mainCamera = FindFirstObjectByType<Camera>();
         }
+
+        // Initialize building counts and prefab indices
         for (int i = 0; i < buildingPrefabs.Length; i++)
         {
-            BuildingData data = buildingPrefabs[i].GetComponent<Building>().data;
-            if (data != null)
+            Building buildingComponent = buildingPrefabs[i].GetComponent<Building>();
+            if (buildingComponent == null || buildingComponent.data == null)
             {
-                buildingCounts[data.buildingName] = 0;
-                prefabIndices[data] = i;
+                Debug.LogError($"Prefab at index {i} has no Building component or data!");
+                continue;
             }
+            BuildingData data = buildingComponent.data;
+            buildingCounts[data.buildingName] = 0;
+            prefabIndices[data] = i;
         }
     }
 
@@ -45,6 +52,12 @@ public class BuildingManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonDown(0)) // Left-click outside placement mode
         {
+            // Prioritize UI clicks over raycast
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return; // Skip raycast if clicking on a UI element
+            }
+
             HandleOutsideClick();
         }
     }
@@ -60,9 +73,9 @@ public class BuildingManager : MonoBehaviour
                 return;
             }
             selectedBuilding = buildingComponent.data;
-            if (selectedBuilding.sprite == null)
+            if (selectedBuilding.sprites == null || selectedBuilding.sprites.Length == 0 || selectedBuilding.sprites[0] == null)
             {
-                Debug.LogError($"BuildingData for {selectedBuilding.buildingName} has no sprite!");
+                Debug.LogError($"BuildingData for {selectedBuilding.buildingName} has no sprite for Level 1!");
                 selectedBuilding = null;
                 return;
             }
@@ -109,11 +122,10 @@ public class BuildingManager : MonoBehaviour
 
         buildingPreview = new GameObject("BuildingPreview");
         SpriteRenderer sr = buildingPreview.AddComponent<SpriteRenderer>();
-        sr.sprite = selectedBuilding.sprite;
+        sr.sprite = selectedBuilding.sprites[0]; // Use the Level 1 sprite for the preview
         sr.color = new Color(1, 1, 1, 0.5f);
         sr.sortingLayerName = "Items";
         sr.sortingOrder = 1;
-        Debug.Log($"Preview created for {selectedBuilding.buildingName}.");
     }
 
     private void HandleBuildingPlacement()
@@ -193,6 +205,34 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
+    // New method to decrement the building count when a building is sold
+    public void OnBuildingSold(Building building)
+    {
+        if (building == null || building.data == null) return;
+
+        string buildingName = building.data.buildingName;
+        if (buildingCounts.ContainsKey(buildingName))
+        {
+            buildingCounts[buildingName]--;
+            if (buildingCounts[buildingName] < 0)
+            {
+                buildingCounts[buildingName] = 0; // Prevent negative counts
+            }
+            Debug.Log($"Sold {buildingName}. New count: {buildingCounts[buildingName]}");
+        }
+
+        // If the sold building was the last clicked Center, reset the reference
+        if (building is Center && building == lastClickedCenter)
+        {
+            lastClickedCenter = null;
+        }
+        // If the sold building was the last clicked building, reset the reference
+        if (building == lastClickedBuilding)
+        {
+            lastClickedBuilding = null;
+        }
+    }
+
     private void HandleOutsideClick()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -207,11 +247,21 @@ public class BuildingManager : MonoBehaviour
                 {
                     lastClickedCenter = building as Center;
                 }
-                BuildingInfoPanel panel = FindFirstObjectByType<BuildingInfoPanel>();
+
+                BuildingInfoPanel panel = FindObjectOfType<BuildingInfoPanel>();
                 if (panel != null)
                 {
-                    Debug.Log($"HandleOutsideClick: Calling ShowPanel for building: {building}");
-                    panel.ShowPanel(building);
+                    // If the same building is clicked again, toggle the panel's visibility
+                    if (building == lastClickedBuilding && panel.panel.activeSelf)
+                    {
+                        panel.HidePanel();
+                        lastClickedBuilding = null; // Reset to allow showing the panel again on the next click
+                    }
+                    else
+                    {
+                        panel.ShowPanel(building);
+                        lastClickedBuilding = building;
+                    }
                 }
                 return;
             }
@@ -221,11 +271,12 @@ public class BuildingManager : MonoBehaviour
         {
             lastClickedCenter.HideRangeVisual();
         }
-        BuildingInfoPanel panelInstance = FindFirstObjectByType<BuildingInfoPanel>();
+        BuildingInfoPanel panelInstance = FindObjectOfType<BuildingInfoPanel>();
         if (panelInstance != null && panelInstance.panel.activeSelf)
         {
             panelInstance.HidePanel();
         }
+        lastClickedBuilding = null; // Reset when clicking outside
     }
 
     private void CancelPlacement()

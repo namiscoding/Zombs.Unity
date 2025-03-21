@@ -13,28 +13,34 @@ MonoBehaviour:
   m_Name: BombTower
   m_EditorClassIdentifier: 
   buildingName: Bomb Tower
-  sprite: {fileID: 1435957736457713407, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  sprites:
+  - {fileID: 1435957736457713407, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: -6819841698245319043, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: 7381464068428021939, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: 388951889637589989, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: -4766507014286398853, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: 6339087641368018831, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
   maxQuantity: 10
   maxHealth: 150
   baseCost:
     wood: 1
-    rock: 1
+    stone: 0
     gold: 1
   levelUpCosts:
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   healthMultipliers:
   - 1

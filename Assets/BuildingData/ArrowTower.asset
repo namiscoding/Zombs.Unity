@@ -13,31 +13,37 @@ MonoBehaviour:
   m_Name: ArrowTower
   m_EditorClassIdentifier: 
   buildingName: Arrow Tower
-  sprite: {fileID: -3036176032955394659, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  sprites:
+  - {fileID: -3036176032955394659, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: -3818454322005777885, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: 826278014653200412, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: -7192875898061866276, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: -2507736370302408344, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: -845333648935180415, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
   maxQuantity: 12
   maxHealth: 100
   baseCost:
     wood: 1
-    rock: 1
+    stone: 1
     gold: 1
   levelUpCosts:
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   healthMultipliers:
   - 1

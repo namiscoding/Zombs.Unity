@@ -11,7 +11,6 @@ public class BuildingInfoPanel : MonoBehaviour
     public GameObject panel; // References PanelContent
     [HideInInspector]
     public Building currentBuilding;
-    [HideInInspector]
     public Camera mainCamera; // Assign the actual Camera in the Inspector
 
     private RectTransform panelRectTransform;
@@ -39,27 +38,19 @@ public class BuildingInfoPanel : MonoBehaviour
                 Debug.LogWarning("No main camera assigned or found in the scene!");
             }
         }
-
-        Debug.Log($"Start: panel = {panel}, panelRectTransform = {panelRectTransform}, canvas = {canvas}, mainCamera = {mainCamera}, Canvas Render Mode = {canvas.renderMode}");
     }
 
     public void ShowPanel(Building building)
     {
-        Debug.Log($"ShowPanel called for building: {building}, lastPositionedBuilding: {lastPositionedBuilding}");
         currentBuilding = building;
         panel.SetActive(true);
 
         // Only reposition if the building has changed
         if (lastPositionedBuilding != building)
         {
-            Debug.Log($"Repositioning panel for new building: {building}");
             PositionPanelAboveBuilding();
             lastPositionedBuilding = building;
             lockPosition = true; // Lock the position after setting
-        }
-        else
-        {
-            Debug.Log($"Building unchanged, keeping panel position: {panelRectTransform.anchoredPosition}");
         }
 
         UpdatePanel();
@@ -67,7 +58,6 @@ public class BuildingInfoPanel : MonoBehaviour
 
     public void HidePanel()
     {
-        Debug.Log("HidePanel called");
         panel.SetActive(false);
         currentBuilding = null;
         lastPositionedBuilding = null; // Reset to allow repositioning when shown again
@@ -76,29 +66,21 @@ public class BuildingInfoPanel : MonoBehaviour
 
     private void PositionPanelAboveBuilding()
     {
-        if (currentBuilding == null || panelRectTransform == null || canvas == null || mainCamera == null)
-        {
-            Debug.LogWarning($"PositionPanelAboveBuilding failed: currentBuilding = {currentBuilding}, panelRectTransform = {panelRectTransform}, canvas = {canvas}, mainCamera = {mainCamera}");
-            return;
-        }
+        if (currentBuilding == null || panelRectTransform == null || canvas == null || mainCamera == null) return;
 
         // Get the building's world position
         Vector3 buildingWorldPos = currentBuilding.transform.position;
-        Debug.Log($"Building world position: {buildingWorldPos}");
 
         // Estimate the building's height (using sprite bounds if available)
         SpriteRenderer spriteRenderer = currentBuilding.GetComponent<SpriteRenderer>();
         float buildingHeight = spriteRenderer != null && spriteRenderer.sprite != null ? spriteRenderer.sprite.bounds.size.y : 1f;
-        Debug.Log($"Building height: {buildingHeight}");
 
         // Offset the position above the building
         Vector3 offset = new Vector3(0, buildingHeight, 0);
         Vector3 worldPosAboveBuilding = buildingWorldPos + offset;
-        Debug.Log($"World position above building: {worldPosAboveBuilding}");
 
         // Convert world position to screen position
         Vector2 screenPos = mainCamera.WorldToScreenPoint(worldPosAboveBuilding);
-        Debug.Log($"Screen position: {screenPos}");
 
         // Convert screen position to Canvas position
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -107,12 +89,10 @@ public class BuildingInfoPanel : MonoBehaviour
             canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCamera,
             out Vector2 localPoint
         );
-        Debug.Log($"Canvas local point (before adjustment): {localPoint}");
 
         // Adjust for the panel's pivot (default pivot is center, so offset by half the panel height)
         Vector2 panelSize = panelRectTransform.rect.size;
         localPoint.y += panelSize.y * 0.5f; // Move up by half the panel height to position above
-        Debug.Log($"Panel size: {panelSize}, Adjusted local point: {localPoint}");
 
         // Clamp the position to keep the panel within the screen bounds
         RectTransform canvasRect = canvas.GetComponent<RectTransform>();
@@ -120,20 +100,17 @@ public class BuildingInfoPanel : MonoBehaviour
         Vector2 panelHalfSize = panelSize * 0.5f;
         localPoint.x = Mathf.Clamp(localPoint.x, -canvasSize.x * 0.5f + panelHalfSize.x, canvasSize.x * 0.5f - panelHalfSize.x);
         localPoint.y = Mathf.Clamp(localPoint.y, -canvasSize.y * 0.5f + panelHalfSize.y, canvasSize.y * 0.5f - panelHalfSize.y);
-        Debug.Log($"Canvas size: {canvasSize}, Clamped local point: {localPoint}");
 
         // Set the panel's position
         panelRectTransform.anchoredPosition = localPoint;
         lastSetPosition = localPoint; // Store the last set position for locking
-        Debug.Log($"Final panel anchoredPosition: {panelRectTransform.anchoredPosition}");
     }
 
     void LateUpdate()
     {
         // Lock the position to prevent unexpected changes
-        if (lockPosition)
+        if (lockPosition && panel.activeSelf && panelRectTransform.anchoredPosition != lastSetPosition)
         {
-            Debug.LogWarning($"Panel position changed unexpectedly! Current: {panelRectTransform.anchoredPosition}, Last set: {lastSetPosition}. Reverting to last set position.");
             panelRectTransform.anchoredPosition = lastSetPosition;
         }
     }
@@ -148,7 +125,7 @@ public class BuildingInfoPanel : MonoBehaviour
         // Build two-column stats text
         string stats = "";
         int nextLevel = currentBuilding.GetLevel() + 1;
-        bool canUpgrade = nextLevel <= 5;
+        bool canUpgrade = nextLevel <= 6; // Updated to 6 levels
 
         // Health (all buildings)
         float currentHealth = currentBuilding.currentHealth;
@@ -200,7 +177,7 @@ public class BuildingInfoPanel : MonoBehaviour
         statsText.text = stats;
 
         // Upgrade and Sell buttons
-        if (nextLevel <= 5)
+        if (nextLevel <= 6) // Updated to 6 levels
         {
             BuildingData.ResourceCost upgradeCost = currentBuilding.data.levelUpCosts[nextLevel - 2];
             string upgradeCostText = $"Upgrade ({upgradeCost.wood} wood, {upgradeCost.stone} stone, {upgradeCost.gold} gold)";
@@ -215,8 +192,19 @@ public class BuildingInfoPanel : MonoBehaviour
             upgradeButton.interactable = false;
         }
 
+        // Handle the Sell button
         BuildingData.ResourceCost sellCost = new BuildingData.ResourceCost { wood = 2, stone = 2, gold = 0 };
-        sellButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Sell ({sellCost.wood} wood, {sellCost.stone} stone)";
+        bool isCenter = currentBuilding.data is CenterData;
+        if (isCenter)
+        {
+            sellButton.GetComponentInChildren<TextMeshProUGUI>().text = "Cannot Sell";
+            sellButton.interactable = false; // Disable the Sell button for Center
+        }
+        else
+        {
+            sellButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Sell ({sellCost.wood} wood, {sellCost.stone} stone)";
+            sellButton.interactable = true; // Enable the Sell button for other buildings
+        }
     }
 
     private float GetStatValue(float baseValue, float[] multipliers)
@@ -241,6 +229,14 @@ public class BuildingInfoPanel : MonoBehaviour
         {
             BuildingData.ResourceCost sellCost = new BuildingData.ResourceCost { wood = 2, stone = 2, gold = 0 };
             ResourceManager.Instance.AddResources(sellCost.wood, sellCost.stone, sellCost.gold);
+
+            // Notify BuildingManager to decrement the count
+            BuildingManager buildingManager = FindObjectOfType<BuildingManager>();
+            if (buildingManager != null)
+            {
+                buildingManager.OnBuildingSold(currentBuilding);
+            }
+
             Destroy(currentBuilding.gameObject);
             HidePanel();
         }

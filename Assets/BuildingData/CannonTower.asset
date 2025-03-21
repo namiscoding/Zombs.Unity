@@ -13,28 +13,34 @@ MonoBehaviour:
   m_Name: CannonTower
   m_EditorClassIdentifier: 
   buildingName: Cannon Tower
-  sprite: {fileID: -4178046375966092550, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  sprites:
+  - {fileID: -4178046375966092550, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: 8982099749623107299, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: -2214249495721929474, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: 7945056504642708236, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: -10500422234371694, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
+  - {fileID: -4683111340605770916, guid: ddf2ec0a3f6511945bd6cf6087ad9ee7, type: 3}
   maxQuantity: 10
   maxHealth: 200
   baseCost:
     wood: 1
-    rock: 1
+    stone: 0
     gold: 1
   levelUpCosts:
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   healthMultipliers:
   - 1

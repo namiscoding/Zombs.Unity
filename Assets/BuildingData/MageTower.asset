@@ -13,28 +13,34 @@ MonoBehaviour:
   m_Name: MageTower
   m_EditorClassIdentifier: 
   buildingName: Mage Tower
-  sprite: {fileID: -7088040987757363880, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  sprites:
+  - {fileID: -7088040987757363880, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: -2201970939035194063, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: -4463496741934443371, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: -9121455277928303340, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: -3000091906368949060, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
+  - {fileID: 7840235571235933139, guid: 4fc1a68dd8932da4881e88dce1a331d7, type: 3}
   maxQuantity: 10
   maxHealth: 50
   baseCost:
     wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   levelUpCosts:
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   - wood: 2
-    rock: 2
+    stone: 0
     gold: 2
   healthMultipliers:
   - 1
