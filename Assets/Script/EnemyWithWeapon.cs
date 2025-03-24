@@ -26,14 +26,19 @@ public class EnemyWithWeapon : MonoBehaviour
     private Vector3 armLocalPosition;
     private Vector3 weaponLocalPosition;
     private WeaponDamage weaponScript; // 💥 Lưu vũ khí để gây damage
-                                       // 💥 Thanh máu
-                                       // 💥 Thanh máu
+    private PlayerManager playerManager;                     // 💥 Thanh máu
+                                                             // 💥 Thanh máu
     public Slider healthBar;
     private Image healthBarFill;
     void Start()
     {
         SetAttributesBasedOnType();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player != null)
+        {
+            playerManager = player.GetComponent<PlayerManager>();
+        }
+
         rb = GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
 
@@ -95,27 +100,33 @@ public class EnemyWithWeapon : MonoBehaviour
         if (weaponTransform != null)
             weaponTransform.localPosition = weaponLocalPosition;
     }
-
+        
     IEnumerator AttackBehavior()
     {
         float elapsed = 0f;
+
+        // Trong suốt quá trình tấn công, nếu player đã chết thì dừng ngay
         while (elapsed < attackDuration)
         {
-            elapsed += Time.deltaTime;
+            // Kiểm tra trạng thái player trước khi tiếp tục animation
+            if (playerManager == null || !playerManager.isAlive)
+            {
+                yield break; // Thoát coroutine nếu player không còn sống
+            }
 
-            // Hiệu ứng tấn công
+            elapsed += Time.deltaTime;
             float attackAngle = Mathf.Sin(elapsed * attackFrequency * Mathf.PI * 2) * attackAmplitude;
             transform.rotation = Quaternion.Euler(0f, 0f, initialAngleZ + attackAngle);
-
             yield return null;
         }
 
-        // 💥 Sau khi vũ khí chạm, gây damage cho player
-        if (weaponScript != null && player != null)
+        // Sau khi kết thúc animation, chỉ áp dụng damage nếu player vẫn sống
+        if (playerManager != null && playerManager.isAlive && weaponScript != null && player != null)
         {
-            weaponScript.DealDamage(player.gameObject);
+            playerManager.TakeDamage(weaponScript.baseDamage);
         }
 
+        // Reset góc và trạng thái tấn công
         transform.rotation = Quaternion.Euler(0f, 0f, initialAngleZ);
         isAttacking = false;
     }

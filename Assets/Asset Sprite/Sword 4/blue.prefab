@@ -802,7 +802,7 @@ MonoBehaviour:
   enemyType: 0
   speed: 0
   maxHealth: 0
-  stopDistance: 1.5
+  stopDistance: 0.5
   attackAmplitude: 30
   attackFrequency: 1
   attackDuration: 1

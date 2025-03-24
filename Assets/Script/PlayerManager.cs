@@ -1,11 +1,11 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerManager : MonoBehaviour
 {
     [SerializeField] private float speed = 5.0f;
-    [SerializeField] private float health, maxHealth = 10;
+    [SerializeField] private float health, maxHealth = 100;
     [SerializeField] private HealthPlayer healthPlayer;
     [SerializeField] private float armor, maxArmor = 10;
     [SerializeField] private ArmorPlayer armorPlayer;
@@ -19,9 +19,10 @@ public class PlayerManager : MonoBehaviour
     private Vector3 mouseP;
     private SpriteRenderer spriteRenderer;
     private Mainmenu mainmenu;
-    public TextMeshProUGUI playerName; 
+    public TextMeshProUGUI playerName;
 
     private bool isArmorVisible = false; // Ẩn thanh Armor khi bắt đầu game
+    public bool isAlive = true;          // Biến trạng thái isAlive, mặc định là true
 
     void Awake()
     {
@@ -46,6 +47,9 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
+        // Nếu player đã chết, không thực hiện Update()
+        if (!isAlive) return;
+
         mouseP = m_Camera.ScreenToWorldPoint(Input.mousePosition);
         mouseP.z = transform.position.z;
         Vector3 rotation = mouseP - transform.position;
@@ -56,87 +60,80 @@ public class PlayerManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        // Nếu player đã chết, không di chuyển
+        if (!isAlive) return;
+
         rb.linearVelocity = moveInput * speed;
     }
 
     public void Move(InputAction.CallbackContext context)
     {
+        if (!isAlive) return;
         moveInput = context.ReadValue<Vector2>();
-        Debug.Log("Move Input: " + moveInput); // Debug
+        Debug.Log("Move Input: " + moveInput);
     }
 
     public void TakeDamage(float damage)
     {
+        if (!isAlive) return; // Nếu đã chết, không nhận damage
+
         if (isArmorVisible && armor > 0)
         {
-            // Trừ máu từ Armor trước
             armor -= damage;
-            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
-
-            // Nếu Armor hết thì ẩn thanh Armor
             if (armor <= 0)
             {
                 armor = 0;
-                armorPlayer.UpdatePlayerArmor(armor, maxArmor);
                 armorPlayer.gameObject.SetActive(false);
                 isArmorVisible = false;
             }
+            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
         }
         else
         {
-            // Trừ máu từ Health khi không còn Armor
             health -= damage;
-            healthPlayer.UpdatePlayerHealth(health, maxHealth);
         }
+
+        // ✅ Cập nhật lại thanh máu sau khi trừ
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
 
         if (health <= 0)
         {
             Die();
         }
     }
-    
+
 
     void Die()
     {
+        isAlive = false; // Đánh dấu player đã chết
         Time.timeScale = 0;
-        gameObject.SetActive(false); // Hide instead of destroy
+        gameObject.SetActive(false); // Ẩn đối tượng
         mainmenu.Revive();
     }
 
     public void Revive()
     {
-        // Reset health to maximum
+        // Reset lại các giá trị khi hồi sinh
         health = maxHealth;
-        
-        healthPlayer.UpdatePlayerHealth(health, maxHealth); // Update UI
-        
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+
         armor = maxArmor;
         armorPlayer.UpdatePlayerArmor(armor, maxArmor);
 
-        // Reset position to starting point
         transform.position = Vector3.zero;
-
-        // Reset rotation
         transform.rotation = Quaternion.identity;
-
-        // Ensure the GameObject is active
         gameObject.SetActive(true);
-
-        // Resume game time
         Time.timeScale = 1;
-
-        // Reset velocity
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
         }
-
-        // Reset to default sprite (hammer)
         if (spriteRenderer != null)
         {
             spriteRenderer.sprite = hammerSprite;
         }
-        mainmenu.startGame(); // This might be a mistake - consider removing or adjusting logic
+        isAlive = true; // Player được đánh dấu sống lại
+        mainmenu.startGame();
         Debug.Log("Player Revived: " + playerName);
     }
 
@@ -144,32 +141,27 @@ public class PlayerManager : MonoBehaviour
     public void ChangeToSword() { spriteRenderer.sprite = swordSprite; }
     public void ChangeToBow() { spriteRenderer.sprite = bowSprite; }
 
-    // New method to set the player name
     public void SetPlayerName(string name)
     {
         playerName.text = name;
         Debug.Log("Player name set to: " + playerName);
-        // You could also update a UI element here if you have a name display
     }
 
-    //Phương thức hồi Full máu
     public void FullHeal()
-{
-    health = maxHealth;
-    healthPlayer.UpdatePlayerHealth(health, maxHealth); // Cập nhật UI thanh máu
-    
-    Debug.Log("Fully healed! Current health: " + health);
+    {
+        health = maxHealth;
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+        Debug.Log("Fully healed! Current health: " + health);
 
-    armor = maxArmor;
-    armorPlayer.UpdatePlayerArmor(armor, maxArmor); // Cập nhật UI thanh máu
-    Debug.Log("Fully healed! Current health: " + armor);
-}
+        armor = maxArmor;
+        armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+        Debug.Log("Fully healed! Current armor: " + armor);
+    }
 
-public void ToggleArmor()
+    public void ToggleArmor()
     {
         if (!isArmorVisible)
         {
-            // Khi click để bật Armor lên
             armor = maxArmor;
             armorPlayer.UpdatePlayerArmor(armor, maxArmor);
             armorPlayer.gameObject.SetActive(true);
