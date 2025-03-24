@@ -1,14 +1,9 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
+
 using UnityEngine.UI;
 using System.Collections;
-
-public class GameManager : MonoBehaviour
+public class TimeManager : MonoBehaviour
 {
-    [SerializeField] private int wood;          // Số lượng gỗ hiện tại
-    [SerializeField] private int stone;         // Số lượng đá hiện tại
-    [SerializeField] private Text txtWood;      // Text UI hiển thị số lượng gỗ
-    [SerializeField] private Text txtStone;     // Text UI hiển thị số lượng đá
     [SerializeField] private GameObject NightUI; //Night UI panel
     [SerializeField] private Text warningText;
     [SerializeField] private Image nightBar;
@@ -23,29 +18,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        UpdateResourceUI();
-    }
-    void UpdateResourceUI()
-    {
-        txtWood.text = "" + wood;
-        txtStone.text = "" + stone;
-        //txtWood.text = "Wood: " + wood;
-        //txtStone.text = "Stone: " + stone;
     }
 
-    // Thêm đá
-    public void AddStone(int quality)
-    {
-        stone += quality;      // Cộng số lượng đá
-        UpdateResourceUI();    // Cập nhật lại UI
-    }
-
-    // Thêm gỗ
-    public void AddWood(int quality)
-    {
-        wood += quality;       // Cộng số lượng gỗ
-        UpdateResourceUI();    // Cập nhật lại UI
-    }
     public void StartNightCycle()
     {
         if (!isNightCycleRunning) // Run only if it's not already running
@@ -58,7 +32,8 @@ public class GameManager : MonoBehaviour
     IEnumerator ToggleNightCycle()
     {
         while (true)
-        {            yield return new WaitForSeconds(timeDuration - 5f); // Daytime duration (55 seconds)
+        {
+            yield return new WaitForSeconds(timeDuration - 5f); // Daytime duration (55 seconds)
 
             // 🚨 Show Countdown Warning ONLY before night
             for (int i = 5; i > 0; i--)
@@ -112,7 +87,8 @@ public class GameManager : MonoBehaviour
                 float barFillAmount2 = 1 - (timeElapsed / timeDuration);
                 nightBar2.fillAmount = barFillAmount2;
                 yield return null; // Wait for the next frame
-            }; // Short delay before switching
+            }
+            ; // Short delay before switching
             timeElapsed = 0f; // Reset for the next phase
             // Process 2: Empty night bar, Fill day bar (1 → 0)
             nightBar.gameObject.SetActive(false); // Hide night bar
