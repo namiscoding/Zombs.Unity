@@ -148,3 +148,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 2ae97bd9017c14645af8abfac8a288cc, type: 2}
+  currentHealth: 0
+  healthBarPrefab: {fileID: 547374149651274230, guid: e5677161ded6ec44fbcb20bc2871e6a7, type: 3}
