@@ -100,6 +100,7 @@ public abstract class Building : MonoBehaviour
         if (healthBarInstance != null)
         {
             Destroy(healthBarInstance);
+            healthBarInstance = null; // Clear the reference
         }
     }
 

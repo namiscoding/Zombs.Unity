@@ -116,6 +116,7 @@ public class Center : Building
 
     void OnDestroy()
     {
+        base.OnDestroy();
         if (rangeVisual != null)
         {
             Destroy(rangeVisual);
