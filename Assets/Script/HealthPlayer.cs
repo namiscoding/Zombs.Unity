@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 public class HealthPlayer : MonoBehaviour
 {
     [SerializeField] private Slider health;
@@ -16,7 +17,7 @@ public class HealthPlayer : MonoBehaviour
         health.value = currentValue / maxValue;
         health2.value = currentValue / maxValue;
     }
-    
+
 
     // Update is called once per frame
     void Update()

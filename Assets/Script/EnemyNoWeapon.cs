@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI; // To use UI elements like Slider for health bar
 using System.Collections;
 
 public class EnemyNoWeapon : MonoBehaviour
@@ -8,30 +9,34 @@ public class EnemyNoWeapon : MonoBehaviour
     public float speed;
     public int maxHealth;
     private int currentHealth;
-    public int attackDamage; // 💥 Sát thương khi tấn công
+    public int attackDamage; // 💥 Attack damage when enemy hits
 
-    public float stopDistance = 0.5f;
-    public float attackAmplitude = 15f;
-    public float attackFrequency = 5f;
+    public float stopDistance = 0.5f;  // Distance at which the enemy will stop
+    public float attackAmplitude = 2f;
+    public float attackFrequency = 1f;
     public float attackDuration = 1f;
 
     private Transform player;
-    private PlayerHealth playerHealth;
+    private PlayerManager playerManager; // Reference to PlayerManager
     private Rigidbody2D rb;
     private bool isAttacking = false;
+    private bool hasHitPlayer = false;  // Flag to track if the enemy has already hit the player
     private float initialAngleZ;
     private Vector3 initialPosition;
 
     public Transform armTransform;
     private Vector3 armLocalPosition;
+    public Slider healthBar;
+    private Image healthBarFill;
 
+    private Animator animator;
     void Start()
     {
         SetAttributesBasedOnType();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (player != null)
         {
-            playerHealth = player.GetComponent<PlayerHealth>();
+            playerManager = player.GetComponent<PlayerManager>();
         }
 
         rb = GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
@@ -41,6 +46,13 @@ public class EnemyNoWeapon : MonoBehaviour
             armLocalPosition = armTransform.localPosition;
 
         currentHealth = maxHealth;
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = maxHealth;
+            healthBarFill = healthBar.fillRect.GetComponent<Image>(); // Get `Image` of Fill
+            healthBarFill.color = Color.green; // Initial color
+        }
     }
 
     void Update()
@@ -55,27 +67,19 @@ public class EnemyNoWeapon : MonoBehaviour
         {
             rb.MovePosition(rb.position + direction * speed * Time.deltaTime);
         }
-        else if (!isAttacking)
+        else if (distanceToPlayer <= stopDistance && !isAttacking)
         {
             isAttacking = true;
             initialPosition = transform.position;
             initialAngleZ = transform.rotation.eulerAngles.z;
             StartCoroutine(AttackBehavior());
         }
-
-        FixArmPosition();
     }
 
     void RotateTowardsPlayer(Vector2 direction)
     {
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
-    }
-
-    void FixArmPosition()
-    {
-        if (armTransform != null)
-            armTransform.localPosition = armLocalPosition;
     }
 
     IEnumerator AttackBehavior()
@@ -91,12 +95,31 @@ public class EnemyNoWeapon : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0f, 0f, initialAngleZ);
         isAttacking = false;
+    }
 
-        // 💥 Sau khi tấn công, gây damage lên Player
-        if (playerHealth != null)
+    // Method to handle collision with the player
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player") && !hasHitPlayer)
         {
-            playerHealth.TakeDamage(attackDamage);
-            Debug.Log($"{enemyType} gây {attackDamage} sát thương lên Player!");
+            // Only apply damage when the player is hit, and ensure damage is only applied once per collision
+            if (playerManager != null)
+            {
+                // Apply a small amount of damage each time the player is hit
+              // You can adjust this value as needed
+                playerManager.TakeDamage(attackDamage); // Deal damage to player
+                hasHitPlayer = true; // Flag to prevent multiple damage in the same collision
+                Debug.Log($"{enemyType} hit the Player! Causing {attackDamage} damage.");
+            }
+        }
+    }
+
+    // Reset the flag when the player leaves the trigger
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            hasHitPlayer = false;  // Reset flag when player leaves collision area
         }
     }
 
@@ -107,22 +130,22 @@ public class EnemyNoWeapon : MonoBehaviour
             case EnemyType.Blue:
                 speed = 3f;
                 maxHealth = 100;
-                attackDamage = 10;
+                attackDamage = 4;
                 break;
             case EnemyType.Green:
                 speed = 2f;
                 maxHealth = 120;
-                attackDamage = 15;
+                attackDamage = 3;
                 break;
             case EnemyType.Red:
                 speed = 6f;
-                maxHealth = 80;
-                attackDamage = 8;
+                maxHealth = 200;
+                attackDamage = 5;
                 break;
             case EnemyType.Yellow:
                 speed = 4f;
                 maxHealth = 150;
-                attackDamage = 12;
+                attackDamage = 6;
                 break;
         }
         currentHealth = maxHealth;
@@ -131,17 +154,33 @@ public class EnemyNoWeapon : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        Debug.Log($"{enemyType} nhận {damage} sát thương. Máu còn lại: {currentHealth}");
+        Debug.Log($"{enemyType} took {damage} damage. Remaining health: {currentHealth}");
+
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth;
+
+            if (healthBarFill != null)
+            {
+                if (currentHealth > maxHealth * 0.6f)
+                    healthBarFill.color = Color.green; // 💚
+                else if (currentHealth > maxHealth * 0.3f)
+                    healthBarFill.color = Color.yellow; // 💛
+                else
+                    healthBarFill.color = Color.red; // ❤️
+            }
+        }
 
         if (currentHealth <= 0)
         {
+            healthBar.gameObject.SetActive(false); // Optionally hide the health bar when dead
             Die();
         }
     }
 
     void Die()
     {
-        Debug.Log($"{enemyType} đã bị tiêu diệt!");
-        Destroy(gameObject);
+        Debug.Log($"{enemyType} has been defeated!");
+        gameObject.SetActive(false); // Set to inactive instead of destroying the object
     }
 }
