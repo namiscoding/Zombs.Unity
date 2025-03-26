@@ -18,10 +18,15 @@ public class ResourceManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        UpdateResourceUI();
+    }
     void UpdateResourceUI()
     {
         txtWood.text = "" + wood;
         txtStone.text = "" + stone;
+        txtGold.text = "" + gold;
         //txtWood.text = "Wood: " + wood;
         //txtStone.text = "Stone: " + stone;
     }
@@ -35,6 +40,7 @@ public class ResourceManager : MonoBehaviour
         wood -= cost.wood;
         stone -= cost.stone;
         gold -= cost.gold;
+        UpdateResourceUI();
         Debug.Log($"Resources left: Wood={wood}, Stone={stone}, Gold={gold}");
     }
 
@@ -44,17 +50,30 @@ public class ResourceManager : MonoBehaviour
         wood += w;
         stone += s;
         gold += g;
+        UpdateResourceUI();
     }
-    public void AddStone(int quality)
+    public void AddStone(int quantity)
     {
-        stone += quality;      // Cộng số lượng đá
+        stone += quantity;      // Cộng số lượng đá
         UpdateResourceUI();    // Cập nhật lại UI
     }
 
     // Thêm gỗ
-    public void AddWood(int quality)
+    public void AddWood(int quantity)
     {
-        wood += quality;       // Cộng số lượng gỗ
+        wood += quantity;       // Cộng số lượng gỗ
         UpdateResourceUI();    // Cập nhật lại UI
+    }
+
+    public void AddGold(int quantity)
+    {
+        gold += quantity;       
+        UpdateResourceUI();    
+    }
+
+    public void UseGold(int quantity)
+    {
+        gold -= quantity;
+        UpdateResourceUI();
     }
 }

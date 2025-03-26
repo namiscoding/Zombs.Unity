@@ -123,7 +123,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.0035010576, y: 0.01750499}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -150,3 +150,6 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 65e93258bd593b64baecfd13c29de35a, type: 2}
   currentHealth: 0
   healthBarPrefab: {fileID: 547374149651274230, guid: e5677161ded6ec44fbcb20bc2871e6a7, type: 3}
+  healthBarHeight: 20
+  healthBarOffset: 0.1
+  widthPadding: 0.9

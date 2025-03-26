@@ -48,6 +48,7 @@ MonoBehaviour:
   - 2
   - 2.5
   - 3
+  - 4
   goldRate: 2
   goldRateMultipliers:
   - 1
@@ -55,3 +56,4 @@ MonoBehaviour:
   - 1.5
   - 2
   - 3
+  - 4

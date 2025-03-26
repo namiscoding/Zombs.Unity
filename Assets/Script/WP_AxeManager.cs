@@ -86,7 +86,7 @@ public class WP_AxeManager : MonoBehaviour
             return false;
         }
 
-        Debug.Log($"Before upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {playerManager.gold}");
+        Debug.Log($"Before upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {ResourceManager.Instance.gold}");
 
         if (currentLevel >= 6) // Đã đạt cấp tối đa
         {
@@ -96,13 +96,13 @@ public class WP_AxeManager : MonoBehaviour
         }
 
         int costIndex = currentLevel - 1; // Vì bắt đầu từ cấp 1, chỉ số mảng bắt đầu từ 0
-        if (playerManager.gold >= upgradeCosts[costIndex])
+        if (ResourceManager.Instance.gold >= upgradeCosts[costIndex])
         {
-            playerManager.gold -= upgradeCosts[costIndex];
+            ResourceManager.Instance.UseGold(upgradeCosts[costIndex]);
             currentLevel++;
             currentAxeDamage = GetCurrentDamage();
             lastUpgradeTime = Time.time;
-            Debug.Log($"After upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {playerManager.gold}");
+            Debug.Log($"After upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {ResourceManager.Instance.gold}");
             UpdateAxePriceUI();
             UpdateAxeUI();
             UpdateAxeUI2();
@@ -110,7 +110,7 @@ public class WP_AxeManager : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Not enough gold to upgrade to Axe Level {currentLevel + 1}! Required: {upgradeCosts[costIndex]} gold, Available: {playerManager.gold}");
+            Debug.Log($"Not enough gold to upgrade to Axe Level {currentLevel + 1}! Required: {upgradeCosts[costIndex]} gold, Available: {ResourceManager.Instance.gold}");
             return false;
         }
     }

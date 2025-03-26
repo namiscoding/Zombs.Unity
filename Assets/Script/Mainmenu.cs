@@ -11,12 +11,11 @@ public class Mainmenu : MonoBehaviour
     public GameObject Utility;
 
     public TMP_InputField playerNameInput;
-    public TextMeshProUGUI NoGold;
 
     void Start()
     {
         playerManager = FindAnyObjectByType<PlayerManager>();
-        if (revivePanel == null || startGamePanel == null || ShopPanel == null || resourcePanel == null || Utility == null || NoGold == null)
+        if (revivePanel == null || startGamePanel == null || ShopPanel == null || resourcePanel == null || Utility == null)
         {
             Debug.LogError("One or more panel references are not assigned in the Inspector!");
         }
@@ -35,13 +34,9 @@ public class Mainmenu : MonoBehaviour
 
         if (playerManager != null)
         {
-            SetNoGold(playerManager.gold);
+            //SetNoGold(playerManager.gold);
         }
-        else
-        {
-            SetNoGold(10000);
-            Debug.LogWarning("PlayerManager not found at Start, setting default gold.");
-        }
+        
     }
 
     public void OpenShop()
@@ -105,11 +100,7 @@ public class Mainmenu : MonoBehaviour
         Debug.Log("Health Potion Panel active: " + (Utility != null ? Utility.activeSelf : "null"));
     }
 
-    public void SetNoGold(int gold)
-    {
-        if (NoGold != null) NoGold.text = gold.ToString();
-    }
-
+   
     public void Revive()
     {
         if (revivePanel != null) revivePanel.SetActive(true);

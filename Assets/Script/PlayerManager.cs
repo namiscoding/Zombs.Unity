@@ -30,8 +30,6 @@ public class PlayerManager : MonoBehaviour
 
     public TextMeshProUGUI playerName;
 
-    public int gold;
-
     private bool isArmorVisible = false;
 
     void Awake()
@@ -42,7 +40,6 @@ public class PlayerManager : MonoBehaviour
 
     void Start()
     {
-        gold = 10000;
         m_Camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         if (m_Camera == null) Debug.LogError("Main Camera not found!");
         rb = GetComponent<Rigidbody2D>();

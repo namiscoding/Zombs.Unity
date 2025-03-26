@@ -3,6 +3,11 @@ using UnityEngine;
 public class Test : MonoBehaviour
 {
     public BuildingManager buildingManager; // Assign in Inspector
+    private NotificationManager notificationManager;
+    void Start()
+    {
+        notificationManager = FindFirstObjectByType<NotificationManager>();
+    }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) FindAnyObjectByType<BuildingManager>().SelectBuilding(0); // Center  
@@ -13,5 +18,6 @@ public class Test : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha6)) FindAnyObjectByType<BuildingManager>().SelectBuilding(5); // Building Type 6  
         if (Input.GetKeyDown(KeyCode.Alpha7)) FindAnyObjectByType<BuildingManager>().SelectBuilding(6); // Building Type 7 
         if (Input.GetKeyDown(KeyCode.Alpha8)) FindAnyObjectByType<BuildingManager>().SelectBuilding(7);
+        if (Input.GetKeyDown(KeyCode.Alpha9)) notificationManager.ShowNotification("You do not have enough resources to buy this item.");
     }
 }

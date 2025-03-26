@@ -177,7 +177,7 @@ public class BuildingInfoPanel : MonoBehaviour
         statsText.text = stats;
 
         // Upgrade and Sell buttons
-        if (nextLevel <= 6) // Updated to 6 levels
+        if (nextLevel <= 6) // Updated to 5 levels
         {
             BuildingData.ResourceCost upgradeCost = currentBuilding.data.levelUpCosts[nextLevel - 2];
             string upgradeCostText = $"Upgrade ({upgradeCost.wood} wood, {upgradeCost.stone} stone, {upgradeCost.gold} gold)";

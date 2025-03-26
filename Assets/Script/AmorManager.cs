@@ -65,9 +65,9 @@ public class AmorManager : MonoBehaviour
         }
 
         int nextLevel = currentLevel + 1;
-        if (playerManager.gold >= upgradeCosts[currentLevel])
+        if (ResourceManager.Instance.gold >= upgradeCosts[currentLevel])
         {
-            playerManager.gold -= upgradeCosts[currentLevel];
+            ResourceManager.Instance.UseGold(upgradeCosts[currentLevel]);
             currentLevel = nextLevel;
             ResetArmor();
             playerManager.SyncWithAmorManager();

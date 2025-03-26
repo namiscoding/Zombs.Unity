@@ -12,6 +12,7 @@ public class BuildingManager : MonoBehaviour
     private Dictionary<BuildingData, int> prefabIndices = new Dictionary<BuildingData, int>();
     private Center lastClickedCenter = null; // Track the last clicked Center
     private Building lastClickedBuilding;
+    NotificationManager notificationManager;
 
     void Start()
     {
@@ -21,7 +22,7 @@ public class BuildingManager : MonoBehaviour
             Debug.LogError("No Main Camera found!");
             mainCamera = FindFirstObjectByType<Camera>();
         }
-
+        notificationManager = FindFirstObjectByType<NotificationManager>();
         // Initialize building counts and prefab indices
         for (int i = 0; i < buildingPrefabs.Length; i++)
         {
@@ -81,19 +82,20 @@ public class BuildingManager : MonoBehaviour
             }
             if (!GameManager.Instance.HasCenter && !(selectedBuilding is CenterData))
             {
-                Debug.Log("Must build Center first!");
+                notificationManager.ShowNotification("Must build Center first!");
+                CancelPlacement();
                 selectedBuilding = null;
                 return;
             }
             if (buildingCounts[selectedBuilding.buildingName] >= selectedBuilding.maxQuantity)
             {
-                Debug.Log($"Max {selectedBuilding.buildingName} reached! Cannot select more.");
+                notificationManager.ShowNotification($"Max {selectedBuilding.buildingName} reached! Cannot select more.");
                 selectedBuilding = null;
                 return;
             }
             if (ResourceManager.Instance == null || !ResourceManager.Instance.CanAfford(selectedBuilding.baseCost))
             {
-                Debug.Log("Not enough resources or ResourceManager missing!");
+                notificationManager.ShowNotification("Not enough resources or ResourceManager missing!");
                 selectedBuilding = null;
                 return;
             }
@@ -149,19 +151,20 @@ public class BuildingManager : MonoBehaviour
             }
             else if (buildingCounts[selectedBuilding.buildingName] >= selectedBuilding.maxQuantity)
             {
-                Debug.Log($"Max {selectedBuilding.buildingName} reached during placement!");
+                notificationManager.ShowNotification($"Max {selectedBuilding.buildingName} reached during placement!");
                 CancelPlacement();
             }
             else
             {
-                Debug.Log("Not enough resources to place another!");
+                notificationManager.ShowNotification("Not enough resources to place another!");
                 CancelPlacement();
             }
         }
         else if (Input.GetMouseButtonDown(1))
         {
             CancelPlacement();
-        }
+        }   
+        
     }
 
     private Vector3 SnapPosition(Vector3 position)
@@ -195,7 +198,7 @@ public class BuildingManager : MonoBehaviour
 
         if (buildingCounts[selectedBuilding.buildingName] >= selectedBuilding.maxQuantity)
         {
-            Debug.Log($"Max {selectedBuilding.buildingName} reached after placing!");
+            notificationManager.ShowNotification($"Max {selectedBuilding.buildingName} reached after placing!");
             CancelPlacement();
         }
         else

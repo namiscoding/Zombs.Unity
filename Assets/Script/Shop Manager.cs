@@ -28,15 +28,14 @@ public class ShopManager : MonoBehaviour
 
     public void PurchaseHealthPotion()
     {
-        if (playerManager.gold >= 100)
+        if (ResourceManager.Instance.gold >= 100)
         {
-            playerManager.gold -= 100;
-            menu.SetNoGold(playerManager.gold);
-            Debug.Log("Health potion bought! Gold remaining: " + playerManager.gold);
+            ResourceManager.Instance.UseGold(100);
+            Debug.Log("Health potion bought! Gold remaining: " + ResourceManager.Instance.gold);
         }
         else
         {
-            Debug.Log("Not enough gold to buy health potion!");
+            NotificationManager.Instance.ShowNotification("Not enough gold to buy health potion!");
         }
     }
 
@@ -48,27 +47,27 @@ public class ShopManager : MonoBehaviour
             {
                 if (amorManager.UpgradeArmor(playerManager))
                 {
-                    menu.SetNoGold(playerManager.gold);
+                    //menu.SetNoGold(playerManager.gold);
                 }
             }
             else if (amorManager.GetCurrentArmor() < amorManager.GetMaxArmor())
             {
-                if (playerManager.gold >= 50)
+                if (ResourceManager.Instance.gold >= 50)
                 {
-                    playerManager.gold -= 50;
+                    ResourceManager.Instance.UseGold(50);
                     amorManager.ResetArmor();
                     Debug.Log($"Armor restored to max: {amorManager.GetMaxArmor()}");
                     playerManager.ToggleArmor();
-                    menu.SetNoGold(playerManager.gold);
+                    //menu.SetNoGold(playerManager.gold);
                 }
                 else
                 {
-                    Debug.Log("Not enough gold to restore armor! Required: 50 gold");
+                    NotificationManager.Instance.ShowNotification("Not enough gold to restore armor!");
                 }
             }
             else
             {
-                Debug.Log("Armor is already at max!");
+                NotificationManager.Instance.ShowNotification("Armor is already at max!");
             }
         }
         else
@@ -85,7 +84,7 @@ public class ShopManager : MonoBehaviour
             {
                 if (swordManager.UpgradeSword(playerManager))
                 {
-                    menu.SetNoGold(playerManager.gold);
+                    //menu.SetNoGold(playerManager.gold);
                     playerManager.ToggleSword();
                     playerManager.ChangeToSword();
                 }
@@ -109,7 +108,7 @@ public class ShopManager : MonoBehaviour
             {
                 if (bowManager.UpgradeBow(playerManager))
                 {
-                    menu.SetNoGold(playerManager.gold);
+                    //menu.SetNoGold(playerManager.gold);
                     playerManager.ToggleBow();
                     playerManager.ChangeToBow();
                 }
@@ -133,7 +132,7 @@ public class ShopManager : MonoBehaviour
             {
                 if (axeManager.UpgradeAxe(playerManager))
                 {
-                    menu.SetNoGold(playerManager.gold);
+                    //menu.SetNoGold(playerManager.gold);
                     playerManager.ToggleAxe();
                     playerManager.ChangeToAxe();
                 }

@@ -96,7 +96,7 @@ public class WP_SwordManager : MonoBehaviour
             return false;
         }
 
-        Debug.Log($"Before upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {playerManager.gold}");
+        Debug.Log($"Before upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {ResourceManager.Instance.gold}");
 
         if (currentLevel >= upgradeCosts.Length)
         {
@@ -106,13 +106,13 @@ public class WP_SwordManager : MonoBehaviour
         }
 
         int costIndex = currentLevel;
-        if (playerManager.gold >= upgradeCosts[costIndex])
+        if (ResourceManager.Instance.gold >= upgradeCosts[costIndex])
         {
-            playerManager.gold -= upgradeCosts[costIndex];
+            ResourceManager.Instance.UseGold(upgradeCosts[costIndex]);
             currentLevel++;
             currentSword = GetCurrentDamage();
             lastUpgradeTime = Time.time;
-            Debug.Log($"After upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {playerManager.gold}");
+            Debug.Log($"After upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {ResourceManager.Instance.gold}");
             UpdateSwordPriceUI();
             UpdateSwordUI(); // Cập nhật UI sau khi nâng cấp
             UpdateSwordUI2();
@@ -120,7 +120,7 @@ public class WP_SwordManager : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Not enough gold to upgrade to Sword Level {currentLevel + 1}! Required: {upgradeCosts[costIndex]} gold, Available: {playerManager.gold}");
+            Debug.Log($"Not enough gold to upgrade to Sword Level {currentLevel + 1}! Required: {upgradeCosts[costIndex]} gold, Available: {ResourceManager.Instance.gold}");
             return false;
         }
     }

@@ -17,6 +17,9 @@ public abstract class Building : MonoBehaviour
     private int maxHealth; // Store the maximum health for health bar calculation
 
     [SerializeField] private GameObject healthBarPrefab; // Assign the HealthBar prefab in the Inspector
+    private float healthBarHeight = 30f; // Increased default height of the health bar
+    private float healthBarOffset = 0.2f; // Small offset from the bottom of the sprite
+    private float widthPadding = 0.9f; // Padding to ensure the health bar fits within the collider
 
     protected virtual void Start()
     {
@@ -67,6 +70,9 @@ public abstract class Building : MonoBehaviour
             return;
         }
 
+        // Disable interactivity to prevent dragging
+        healthBarSlider.interactable = false;
+
         // Store the maximum health
         maxHealth = currentHealth;
 
@@ -76,11 +82,13 @@ public abstract class Building : MonoBehaviour
 
     protected virtual void Update()
     {
-        // Update the health bar position every frame
+        // Update the health bar position and scale every frame
         if (healthBarInstance != null && healthBarRectTransform != null)
         {
             PositionHealthBar();
         }
+
+        // Debug: Press T to take damage, R to restore full health, H to heal 10
         if (Input.GetKeyDown(KeyCode.T))
         {
             TakeDamage(10); // Deal 10 damage
@@ -91,6 +99,11 @@ public abstract class Building : MonoBehaviour
             currentHealth = maxHealth; // Restore full health
             UpdateHealthBar();
             Debug.Log($"{data.buildingName} restored to full health. Current health: {currentHealth}/{maxHealth}");
+        }
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Heal(10); // Heal 10 health
+            Debug.Log($"{data.buildingName} healed 10 health. Current health: {currentHealth}/{maxHealth}");
         }
     }
 
@@ -106,7 +119,11 @@ public abstract class Building : MonoBehaviour
 
     public virtual void LevelUp()
     {
-        if (currentLevel >= 6 || (currentLevel >= GameManager.Instance.CenterLevel && data is not CenterData)) return;
+        if (currentLevel >= 6 || (currentLevel >= GameManager.Instance.CenterLevel && data is not CenterData))
+        {
+            NotificationManager.Instance.ShowNotification("deo nang cap duoc");
+            return;
+        }
         int nextLevelIndex = currentLevel - 1;
         if (ResourceManager.Instance.CanAfford(data.levelUpCosts[nextLevelIndex]))
         {
@@ -123,6 +140,7 @@ public abstract class Building : MonoBehaviour
     {
         currentHealth = (int)(data.maxHealth * data.healthMultipliers[currentLevel - 1]);
         maxHealth = currentHealth; // Update maxHealth when stats change
+        NotificationManager.Instance.ShowNotification($"{currentHealth}");
     }
 
     protected virtual void UpdateSprite()
@@ -154,21 +172,33 @@ public abstract class Building : MonoBehaviour
         }
     }
 
+    public virtual void Heal(int amount)
+    {
+        currentHealth += amount;
+        if (currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+        UpdateHealthBar();
+    }
+
     void OnMouseDown()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.T))
         {
-            // Skip if the click is over a UI element
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
-
-            BuildingInfoPanel panel = FindFirstObjectByType<BuildingInfoPanel>();
-            if (panel != null)
-            {
-                panel.ShowPanel(this);
-            }
+            TakeDamage(10); // Deal 10 damage
+            Debug.Log($"{data.buildingName} took 10 damage. Current health: {currentHealth}/{maxHealth}");
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            currentHealth = maxHealth; // Restore full health
+            UpdateHealthBar();
+            Debug.Log($"{data.buildingName} restored to full health. Current health: {currentHealth}/{maxHealth}");
+        }
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Heal(10); // Heal 10 health
+            Debug.Log($"{data.buildingName} healed 10 health. Current health: {currentHealth}/{maxHealth}");
         }
     }
 
@@ -195,20 +225,24 @@ public abstract class Building : MonoBehaviour
 
     private void PositionHealthBar()
     {
-        if (mainCamera == null || canvas == null) return;
+        if (mainCamera == null || canvas == null || spriteRenderer == null || spriteRenderer.sprite == null) return;
 
         // Get the building's world position
         Vector3 buildingWorldPos = transform.position;
 
-        // Estimate the building's height (using sprite bounds if available)
-        float buildingHeight = spriteRenderer != null && spriteRenderer.sprite != null ? spriteRenderer.sprite.bounds.size.y : 1f;
+        // Get the sprite's bounds to determine its height (for positioning)
+        Bounds spriteBounds = spriteRenderer.sprite.bounds;
+        float spriteHeight = spriteBounds.size.y * transform.localScale.y; // Account for sprite scaling
 
-        // Offset the position below the building
-        Vector3 offset = new Vector3(0, -buildingHeight/2, 0); // Changed to negative to place below
-        Vector3 worldPosBelowBuilding = buildingWorldPos + offset;
+        // Calculate the position inside the sprite, near the bottom
+        // The bottom of the sprite in world space is at buildingWorldPos.y - spriteHeight/2
+        // Place the health bar just above the bottom edge (inside the sprite)
+        float yOffsetInsideSprite = -spriteHeight / 2 + healthBarOffset; // Small offset from the bottom
+        Vector3 offset = new Vector3(0, yOffsetInsideSprite, 0);
+        Vector3 worldPosInsideSprite = buildingWorldPos + offset;
 
         // Convert world position to screen position
-        Vector2 screenPos = mainCamera.WorldToScreenPoint(worldPosBelowBuilding);
+        Vector2 screenPos = mainCamera.WorldToScreenPoint(worldPosInsideSprite);
 
         // Convert screen position to Canvas position
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -218,11 +252,35 @@ public abstract class Building : MonoBehaviour
             out Vector2 localPoint
         );
 
-        // Adjust for the health bar's pivot (default pivot is center, so offset by half the health bar height)
-        Vector2 healthBarSize = healthBarRectTransform.rect.size;
-        localPoint.y -= healthBarSize.y * 0.5f; // Move down by half the health bar height to position below
+        // Get the collider's width to determine the health bar's width
+        float colliderWidth = 1f; // Default width if no collider is found
+        BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
 
-        // Set the health bar's position
+        if (boxCollider != null)
+        {
+            colliderWidth = boxCollider.size.x * transform.localScale.x; // Account for collider scaling
+        }
+        else
+        {
+            Debug.LogWarning($"{data.buildingName} has no BoxCollider2D or CircleCollider2D! Using default width for health bar.");
+        }
+
+        // Convert collider width from world units to screen units
+        Vector3 colliderWorldRightEdge = buildingWorldPos + new Vector3(colliderWidth / 2, 0, 0);
+        Vector3 colliderWorldLeftEdge = buildingWorldPos - new Vector3(colliderWidth / 2, 0, 0);
+        Vector2 screenRightEdge = mainCamera.WorldToScreenPoint(colliderWorldRightEdge);
+        Vector2 screenLeftEdge = mainCamera.WorldToScreenPoint(colliderWorldLeftEdge);
+        float screenWidth = Mathf.Abs(screenRightEdge.x - screenLeftEdge.x);
+
+        // Convert screen width to Canvas space using the Canvas's actual scale
+        RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+        float canvasScaleFactor = canvasRect.lossyScale.x; // Use the Canvas's x-scale
+        float healthBarWidth = screenWidth * canvasScaleFactor * widthPadding; // Apply padding to fit within collider
+
+        // Set the health bar size
+        healthBarRectTransform.sizeDelta = new Vector2(healthBarWidth, healthBarHeight);
+
+        // Set the health bar's position (centered horizontally, positioned at the calculated y)
         healthBarRectTransform.anchoredPosition = localPoint;
     }
 
