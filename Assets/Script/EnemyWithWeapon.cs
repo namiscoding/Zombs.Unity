@@ -1,37 +1,39 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 
 public class EnemyWithWeapon : MonoBehaviour
 {
     public enum EnemyType { Blue, Green, Red, Yellow, Boss1, Boss2 }
     public EnemyType enemyType;
+    public enum WeaponType { Sword, Mace, Shovel, NoWeapon, Boss1, Boss2 }
+    public WeaponType weaponType;
     public float speed;
     public int maxHealth;
     private int currentHealth;
-
-    public float stopDistance = 1.5f;
-    public float attackAmplitude = 30f;
-    public float attackFrequency = 1f;
-    public float attackDuration = 1f;
-
+    public int baseDamage;
+    public float stopDistance = 2f;
+    public float attackCooldown = 1f; // Thời gian cooldown giữa các lần gây sát thương bằng vũ khí (giây)
+    public float attackRange = 2f; // Khoảng cách để weapon tấn công
+    public float weaponRotationSpeed = 5f; // Tốc độ xoay của weapon
+    private Animator animator;
     private Transform player;
     private Rigidbody2D rb;
+    private Transform weapon;
+    private PlayerManager playerManager;
+    public Slider healthBar;
+    private Image healthBarFill;
+    private float lastAttackTime; // Thời gian lần cuối gây sát thương bằng vũ khí
     private bool isAttacking = false;
     private float initialAngleZ;
     private Vector3 initialPosition;
 
     public Transform armTransform;
-    public Transform weaponTransform;
     private Vector3 armLocalPosition;
-    private Vector3 weaponLocalPosition;
-    private WeaponDamage weaponScript; // 💥 Lưu vũ khí để gây damage
-    private PlayerManager playerManager;                     // 💥 Thanh máu
-                                                             // 💥 Thanh máu
-    public Slider healthBar;
-    private Image healthBarFill;
+
     void Start()
     {
+        animator = GetComponent<Animator>();
+        SetDamageByWeaponType();
         SetAttributesBasedOnType();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (player != null)
@@ -42,24 +44,33 @@ public class EnemyWithWeapon : MonoBehaviour
         rb = GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        // Lấy script WeaponDamage từ weaponTransform
-        if (weaponTransform != null)
-        {
-            weaponScript = weaponTransform.GetComponent<WeaponDamage>();
-            weaponLocalPosition = weaponTransform.localPosition;
-            weaponLocalPosition += new Vector3(0, 0.1f, 0);
-        }
-
         if (armTransform != null)
             armLocalPosition = armTransform.localPosition;
+
+        currentHealth = maxHealth;
         if (healthBar != null)
         {
             healthBar.maxValue = maxHealth;
             healthBar.value = maxHealth;
-            healthBarFill = healthBar.fillRect.GetComponent<Image>(); // Lấy `Image` của Fill
-            healthBarFill.color = Color.green; // 💚 Ban đầu màu xanh lá
+            healthBarFill = healthBar.fillRect.GetComponent<Image>(); // Get `Image` of Fill
+            healthBarFill.color = Color.green; // Initial color
         }
     }
+    void SetDamageByWeaponType()
+    {
+        switch (weaponType)
+        {
+            case WeaponType.Sword: baseDamage = 7; break;
+            case WeaponType.Mace: baseDamage = 8; break;
+            case WeaponType.Shovel: baseDamage = 9; break;
+            case WeaponType.NoWeapon: baseDamage = 10; break;
+            case WeaponType.Boss1: baseDamage = 11; break;
+            case WeaponType.Boss2: baseDamage = 12; break;
+            default: baseDamage = 10; break;
+        }
+    }
+
+
 
     void Update()
     {
@@ -70,66 +81,37 @@ public class EnemyWithWeapon : MonoBehaviour
 
         RotateTowardsPlayer(direction);
 
+        // Nếu player chạy xa ra thì cho phép enemy đuổi tiếp
+        if (distanceToPlayer > stopDistance + 0.5f)
+        {
+            isAttacking = false;
+            animator.SetBool("isNearPlayer", false);
+        }
+
         if (distanceToPlayer > stopDistance && !isAttacking)
         {
             rb.MovePosition(rb.position + direction * speed * Time.deltaTime);
         }
-        else if (!isAttacking)
+        else if (distanceToPlayer <= stopDistance && !isAttacking)
         {
             isAttacking = true;
             initialPosition = transform.position;
             initialAngleZ = transform.rotation.eulerAngles.z;
-
-            StartCoroutine(AttackBehavior());
+            animator.SetBool("isNearPlayer", true);
         }
-
-        FixArmAndWeaponPosition();
     }
 
+
+
+    // Xoay vũ khí về hướng Player
     void RotateTowardsPlayer(Vector2 direction)
     {
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
-    void FixArmAndWeaponPosition()
-    {
-        if (armTransform != null)
-            armTransform.localPosition = armLocalPosition;
+    // Xoay MaceYellow theo hướng của WeaponTransform
 
-        if (weaponTransform != null)
-            weaponTransform.localPosition = weaponLocalPosition;
-    }
-        
-    IEnumerator AttackBehavior()
-    {
-        float elapsed = 0f;
-
-        // Trong suốt quá trình tấn công, nếu player đã chết thì dừng ngay
-        while (elapsed < attackDuration)
-        {
-            // Kiểm tra trạng thái player trước khi tiếp tục animation
-            if (playerManager == null || !playerManager.isAlive)
-            {
-                yield break; // Thoát coroutine nếu player không còn sống
-            }
-
-            elapsed += Time.deltaTime;
-            float attackAngle = Mathf.Sin(elapsed * attackFrequency * Mathf.PI * 2) * attackAmplitude;
-            transform.rotation = Quaternion.Euler(0f, 0f, initialAngleZ + attackAngle);
-            yield return null;
-        }
-
-        // Sau khi kết thúc animation, chỉ áp dụng damage nếu player vẫn sống
-        if (playerManager != null && playerManager.isAlive && weaponScript != null && player != null)
-        {
-            playerManager.TakeDamage(weaponScript.baseDamage);
-        }
-
-        // Reset góc và trạng thái tấn công
-        transform.rotation = Quaternion.Euler(0f, 0f, initialAngleZ);
-        isAttacking = false;
-    }
 
     void SetAttributesBasedOnType()
     {
@@ -150,29 +132,26 @@ public class EnemyWithWeapon : MonoBehaviour
         currentHealth -= damage;
         Debug.Log($"{enemyType} nhận {damage} sát thương. Máu còn lại: {currentHealth}");
 
-        // 💥 Cập nhật thanh máu
         if (healthBar != null)
         {
             healthBar.value = currentHealth;
 
-            // 🔥 Thay đổi màu dựa vào phần trăm máu
             if (healthBarFill != null)
             {
                 if (currentHealth > maxHealth * 0.6f)
                 {
-                    healthBarFill.color = Color.green; // 💚 Xanh lá (Máu > 60%)
+                    healthBarFill.color = Color.green;
                 }
                 else if (currentHealth > maxHealth * 0.3f)
                 {
-                    healthBarFill.color = Color.yellow; // 💛 Vàng (Máu 30-60%)
+                    healthBarFill.color = Color.yellow;
                 }
                 else
                 {
-                    healthBarFill.color = Color.red; // ❤️ Đỏ (Máu < 30%)
+                    healthBarFill.color = Color.red;
                 }
             }
 
-            // Ẩn thanh máu nếu máu = 0
             if (currentHealth <= 0)
             {
                 healthBar.gameObject.SetActive(false);
@@ -185,5 +164,15 @@ public class EnemyWithWeapon : MonoBehaviour
     {
         Debug.Log($"{enemyType} đã bị tiêu diệt!");
         Destroy(gameObject);
+    }
+
+    public void OnWeaponHitPlayer(Collider2D other)
+    {
+        if (playerManager != null && playerManager.isAlive && Time.time - lastAttackTime >= attackCooldown)
+        {
+            playerManager.TakeDamage(baseDamage);
+            Debug.Log($"{enemyType}'s weapon gây {baseDamage} sát thương cho Player!");
+            lastAttackTime = Time.time;
+        }
     }
 }

@@ -29,6 +29,7 @@ public class EnemyNoWeapon : MonoBehaviour
     public Slider healthBar;
     private Image healthBarFill;
 
+    private Animator animator;
     void Start()
     {
         SetAttributesBasedOnType();

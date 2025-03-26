@@ -7,7 +7,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float speed = 5.0f;
     [SerializeField] private float health, maxHealth = 100;
     [SerializeField] private HealthPlayer healthPlayer;
-    [SerializeField] private float armor, maxArmor = 10;
+    [SerializeField] private float armor, maxArmor = 100;
     [SerializeField] private ArmorPlayer armorPlayer;
     [SerializeField] private Sprite hammerSprite;
     [SerializeField] private Sprite swordSprite;
@@ -26,7 +26,7 @@ public class PlayerManager : MonoBehaviour
 
     void Awake()
     {
-        healthPlayer = GetComponentInChildren<HealthPlayer>();
+        healthPlayer = GetComponentInChildren<HealthPlayer>();  
         armorPlayer = GetComponentInChildren<ArmorPlayer>();
     }
 
@@ -77,6 +77,9 @@ public class PlayerManager : MonoBehaviour
     {
         if (!isAlive) return; // Nếu đã chết, không nhận damage
 
+        // Ghi log khi nhận damage
+        Debug.Log($"Player nhận {damage} sát thương!");
+
         if (isArmorVisible && armor > 0)
         {
             armor -= damage;
@@ -95,6 +98,9 @@ public class PlayerManager : MonoBehaviour
 
         // ✅ Cập nhật lại thanh máu sau khi trừ
         healthPlayer.UpdatePlayerHealth(health, maxHealth);
+
+        // Ghi log trạng thái sau khi trừ damage
+        Debug.Log($"Armor: {armor} / {maxArmor}, Health: {health} / {maxHealth}");
 
         if (health <= 0)
         {

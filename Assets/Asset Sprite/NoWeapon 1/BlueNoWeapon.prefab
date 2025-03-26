@@ -237,7 +237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f348f77e9bcd5f4c92f25ec71edd2b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponType: 3
   baseDamage: 0
 --- !u!1 &2532265190196982198
 GameObject:
