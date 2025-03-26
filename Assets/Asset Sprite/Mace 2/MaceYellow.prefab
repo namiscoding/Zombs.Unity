@@ -117,7 +117,7 @@ Transform:
   m_GameObject: {fileID: 1710531046179627474}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.0010530626, w: 0.99999946}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.593, y: 0.224, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -213,8 +213,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1.2, y: 1.2}
+  m_Offset: {x: 0.35907355, y: -0.12712972}
+  m_Size: {x: 1.4096645, y: 1.4096644}
   m_Direction: 0
 --- !u!50 &4841919689532320088
 Rigidbody2D:
@@ -287,10 +287,7 @@ MonoBehaviour:
   attackRange: 2
   weaponRotationSpeed: 5
   healthBar: {fileID: 0}
-  weaponTarget: {fileID: 8663479051970344009}
-  weaponDistanceFromMace: 1
-  followSpeed: 3
-  followDistance: 1
+  armTransform: {fileID: 0}
 --- !u!1 &6706831187733528701
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,7 +316,7 @@ Transform:
   m_GameObject: {fileID: 6706831187733528701}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.37, y: 0.082, z: 0}
+  m_LocalPosition: {x: -0.616, y: -0.27, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

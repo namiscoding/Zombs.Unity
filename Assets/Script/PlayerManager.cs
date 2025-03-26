@@ -2,6 +2,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Splines;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class PlayerManager : MonoBehaviour
     private WP_AxeManager axeManager;
 
     public TextMeshProUGUI playerName;
-
+    public bool isAlive = true;
     private bool isArmorVisible = false;
 
     void Awake()
@@ -87,33 +88,40 @@ public class PlayerManager : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        float reducedDamage = damage;
-        if (amorManager != null && amorManager.GetMaxArmor() > 0 && amorManager.GetCurrentArmor() > 0)
-        {
-            float damageReduction = amorManager.GetDamageReduction();
-            reducedDamage = damage * (1f - damageReduction);
-            amorManager.TakeDamage(reducedDamage);
-            armor = amorManager.GetCurrentArmor();
-            maxArmor = amorManager.GetMaxArmor();
-            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+        if (!isAlive) return; // Nếu đã chết, không nhận damage
 
+        // Ghi log khi nhận damage
+        Debug.Log($"Player nhận {damage} sát thương!");
+
+        if (isArmorVisible && armor > 0)
+        {
+            armor -= damage;
             if (armor <= 0)
             {
+                armor = 0;
                 armorPlayer.gameObject.SetActive(false);
                 isArmorVisible = false;
             }
+            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
         }
         else
         {
             health -= damage;
-            healthPlayer.UpdatePlayerHealth(health, maxHealth);
         }
+
+        // ✅ Cập nhật lại thanh máu sau khi trừ
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+
+        // Ghi log trạng thái sau khi trừ damage
+        Debug.Log($"Armor: {armor} / {maxArmor}, Health: {health} / {maxHealth}");
 
         if (health <= 0)
         {
             Die();
         }
     }
+
+
 
     void Die()
     {
