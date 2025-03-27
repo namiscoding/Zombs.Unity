@@ -5,12 +5,11 @@ using System.Collections;
 public class TimeManager : MonoBehaviour
 {
     [SerializeField] private GameObject NightUI; //Night UI panel
-    [SerializeField] private Text warningText;
     [SerializeField] private Image nightBar;
     [SerializeField] private Image dayBar;
     [SerializeField] private Image nightBar2;
     [SerializeField] private Image dayBar2;
-    [SerializeField] private float timeDuration = 60f;
+    [SerializeField] private float timeDuration = 100f;
     private bool isNightActive = false;
     private bool isNightCycleRunning = false;
     private bool isTimeBarRunning = false;
@@ -38,15 +37,13 @@ public class TimeManager : MonoBehaviour
             // 🚨 Show Countdown Warning ONLY before night
             for (int i = 5; i > 0; i--)
             {
-                warningText.text = "Night starts in " + i + " seconds!";
-                warningText.gameObject.SetActive(true);
+                NotificationManager.Instance.ShowNotification($"Night starts in " + i + " seconds!");
                 yield return new WaitForSeconds(1f); // Wait 1 second for countdown
             }
 
             // 🌙 Activate Night
             isNightActive = true;
             NightUI.SetActive(true);
-            warningText.gameObject.SetActive(false); // Hide warning after night starts
 
             //a feature of spawn enemy will be here.
 

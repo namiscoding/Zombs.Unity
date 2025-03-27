@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
             // 🚨 Show Countdown Warning ONLY before night
             for (int i = 5; i > 0; i--)
             {
-                warningText.text = "Night starts in " + i + " seconds!";
+                NotificationManager.Instance.ShowNotification($"Night starts in " + i + " seconds!");
                 warningText.gameObject.SetActive(true);
                 yield return new WaitForSeconds(1f); // Wait 1 second for countdown
             }
