@@ -3,24 +3,24 @@ using UnityEngine;
 
 public class WP_AxeManager : MonoBehaviour
 {
-    [SerializeField] private int currentLevel = 1; // Bắt đầu từ cấp 1 (mặc định có búa)
-    private float[] damage = { 10f, 20f, 30f, 40f, 50f, 60f }; // 6 cấp độ sát thương (1-6)
-    private int[] upgradeCosts = { 300, 600, 1200, 1800, 2400 }; // 5 lần nâng cấp từ 1->2, 2->3, ..., 5->6
+    [SerializeField] private int currentLevel = 1; 
+    private float[] damage = { 10f, 20f, 30f, 40f, 50f, 60f }; 
+    private int[] upgradeCosts = { 300, 600, 1200, 1800, 2400 }; 
     private float currentAxeDamage;
 
-    [SerializeField] private Sprite[] axeSprites; // Mảng 6 sprite cho các cấp độ rìu 1-6 (cho player)
-    [SerializeField] private Sprite[] axeSpritesWP; // Mảng 6 sprite cho UI cấp độ rìu 1-6
-    [SerializeField] private Sprite[] axeSpritesShop; // Mảng 6 sprite cho UI Shop cấp độ rìu 1-6
+    [SerializeField] private Sprite[] axeSprites; 
+    [SerializeField] private Sprite[] axeSpritesWP; 
+    [SerializeField] private Sprite[] axeSpritesShop; 
 
-    public TextMeshProUGUI AxePrice; // Giá nâng cấp
-    public TextMeshProUGUI currentDamageTxt; // Sát thương hiện tại
-    public TextMeshProUGUI nextDamageTxt; // Sát thương cấp tiếp theo
+    public TextMeshProUGUI AxePrice; 
+    public TextMeshProUGUI currentDamageTxt; 
+    public TextMeshProUGUI nextDamageTxt; 
 
-    [SerializeField] private GameObject changeToAxePanel; // Panel UI hiển thị rìu
-    [SerializeField] private GameObject changeToAxePanel2; // Panel UI thứ hai (Shop UI)
+    [SerializeField] private GameObject changeToAxePanel; 
+    [SerializeField] private GameObject changeToAxePanel2; 
 
     private float lastUpgradeTime = 0f;
-    private float upgradeCooldown = 0.5f; // Cooldown để tránh gọi nhiều lần
+    private float upgradeCooldown = 0.5f; 
 
     void Start()
     {

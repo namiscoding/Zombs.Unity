@@ -4,7 +4,7 @@ using UnityEngine;
 public class WP_BowManager : MonoBehaviour
 {
     [SerializeField] private int currentLevel = 0; // 0 = không có cung, 1-5 = cấp độ cung
-    private float[] damage = { 0f, 15f, 25f, 35f, 45f, 55f, 65f }; // damage[0] = 0 (không có cung)
+    private float[] damage = { 0f, 5f, 10f, 15f, 20f, 25f, 30f }; // damage[0] = 0 (không có cung)
     private int[] upgradeCosts = { 200, 500, 1000, 1500, 2000, 2500 }; // Chi phí nâng cấp
     private float currentBowDamage;
 

@@ -16,6 +16,10 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private GameObject changeToSwordPanel;
     [SerializeField] private GameObject changeToBowPanel;
     [SerializeField] private GameObject changeToAxePanel;
+    [SerializeField] private GameObject Arrow;
+    [SerializeField] public GameObject spriteHolder; // Gắn SpriteHolder vào Inspector
+
+    
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -28,10 +32,12 @@ public class PlayerManager : MonoBehaviour
     private WP_SwordManager swordManager;
     private WP_BowManager bowManager;
     private WP_AxeManager axeManager;
+    //private Animator animator;
 
     public TextMeshProUGUI playerName;
     public bool isAlive = true;
     private bool isArmorVisible = false;
+    private Animator animatedSpriteAnimator;
 
     void Awake()
     {
@@ -63,17 +69,33 @@ public class PlayerManager : MonoBehaviour
         changeToSwordPanel.SetActive(false);
         changeToBowPanel.SetActive(false);
         changeToAxePanel.SetActive(true);
+        Arrow.SetActive(false);
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        animatedSpriteAnimator = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<Animator>();
+        if (animatedSpriteRenderer != null)
+        {
+            animatedSpriteRenderer.sprite = hammerSprite;
+        }
+        else
+        {
+            Debug.LogError("Failed to set initial hammer sprite: AnimatedSprite not found under SpriteHolder!");
+        }
+        if (animatedSpriteAnimator == null)
+        {
+            Debug.LogError("Animator not found on AnimatedSprite!");
+        }   
         SyncWithAmorManager();
     }
 
     void Update()
     {
+        // Tính toán rotation cơ bản dựa trên vị trí chuột
         mouseP = m_Camera.ScreenToWorldPoint(Input.mousePosition);
-        mouseP.z = transform.position.z;
-        Vector3 rotation = mouseP - transform.position;
+        mouseP.z = spriteHolder.transform.position.z;
+        Vector3 rotation = mouseP - spriteHolder.transform.position;
         float rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
-        rotZ += 160f;
-        transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
+        rotZ += 160f; // Offset của bạn
+        spriteHolder.transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
     }
 
     void FixedUpdate()
@@ -157,35 +179,60 @@ public class PlayerManager : MonoBehaviour
         if (mainmenu != null) mainmenu.startGame();
     }
 
-    public void ChangeToHammer()
-    {
-        if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite;
-    }
-
     public void ChangeToSword()
     {
-        if (spriteRenderer != null && swordManager != null)
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        if (animatedSpriteRenderer != null && swordManager != null)
         {
-            spriteRenderer.sprite = swordManager.GetCurrentSwordSprite();
-            Debug.Log("Changed to sword sprite: " + spriteRenderer.sprite.name);
+            animatedSpriteRenderer.sprite = swordManager.GetCurrentSwordSprite();
+            if (animatedSpriteAnimator != null)
+            {
+                animatedSpriteAnimator.enabled = true; // Enable animation for sword
+            }
+            Debug.Log("Changed AnimatedSprite to sword sprite: " + animatedSpriteRenderer.sprite.name);
+            Arrow.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("AnimatedSprite child not found under SpriteHolder, missing SpriteRenderer, or swordManager is null!");
         }
     }
 
     public void ChangeToBow()
     {
-        if (spriteRenderer != null && bowManager != null)
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        if (animatedSpriteRenderer != null && bowManager != null)
         {
-            spriteRenderer.sprite = bowManager.GetCurrentBowSprite();
-            Debug.Log("Changed to bow sprite: " + spriteRenderer.sprite.name);
+            animatedSpriteRenderer.sprite = bowManager.GetCurrentBowSprite();
+            if (animatedSpriteAnimator != null)
+            {
+                animatedSpriteAnimator.enabled = false; // Disable animation for bow
+            }
+            Debug.Log("Changed AnimatedSprite to bow sprite: " + animatedSpriteRenderer.sprite.name);
+            Arrow.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("AnimatedSprite child not found under SpriteHolder, missing SpriteRenderer, or bowManager is null!");
         }
     }
 
     public void ChangeToAxe()
     {
-        if (spriteRenderer != null && axeManager != null)
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        if (animatedSpriteRenderer != null && axeManager != null)
         {
-            spriteRenderer.sprite = axeManager.GetCurrentAxeSprite();
-            Debug.Log("Changed to axe sprite: " + spriteRenderer.sprite.name);
+            animatedSpriteRenderer.sprite = axeManager.GetCurrentAxeSprite();
+            if (animatedSpriteAnimator != null)
+            {
+                animatedSpriteAnimator.enabled = true; // Enable animation for axe
+            }
+            Debug.Log("Changed AnimatedSprite to axe sprite: " + animatedSpriteRenderer.sprite.name);
+            Arrow.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("AnimatedSprite child not found under SpriteHolder, missing SpriteRenderer, or axeManager is null!");
         }
     }
 

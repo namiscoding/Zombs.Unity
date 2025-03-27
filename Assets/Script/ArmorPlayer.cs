@@ -12,9 +12,10 @@ public class ArmorPlayer : MonoBehaviour
         armor.interactable = false;
         armor.minValue = 0;
         armor.maxValue = 1;
+        armor.value = armor.maxValue; // Đặt giá trị mặc định bằng maxValue
         amorManager = FindFirstObjectByType<AmorManager>();
         if (amorManager == null) Debug.LogError("AmorManager not found!");
-        UpdatePlayerArmor(0, 0);
+        UpdatePlayerArmor(armor.maxValue, armor.maxValue); // Cập nhật thanh armor
     }
 
     public void UpdatePlayerArmor(float currentValue, float maxValue)
