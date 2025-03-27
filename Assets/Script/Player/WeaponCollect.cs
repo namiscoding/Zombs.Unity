@@ -21,18 +21,28 @@ public class WeaponCollect : MonoBehaviour
     {
         HandleAttack();
     }
-
     void HandleAttack()
     {
-        if (Input.GetMouseButtonDown(0) && Time.time >= lastAttackTime + attackCooldown)
+        if (Input.GetMouseButton(1) && Time.time >= lastAttackTime + attackCooldown) // 1s cooldown
         {
             bool attackSuccess = Shoot();
             if (attackSuccess)
             {
-                lastAttackTime = Time.time;
+                lastAttackTime = Time.time; // Update last attack time
             }
         }
     }
+    //void HandleAttack()
+    //{
+    //    if (Input.GetMouseButtonDown(1) && Time.time >= lastAttackTime + attackCooldown)
+    //    {
+    //        bool attackSuccess = Shoot();
+    //        if (attackSuccess)
+    //        {
+    //            lastAttackTime = Time.time;
+    //        }
+    //    }
+    //}
 
     bool Shoot()
     {
@@ -51,8 +61,8 @@ public class WeaponCollect : MonoBehaviour
                     collect.SetPool(attackPool);
                 }
 
-                animator.SetBool("isCollect", true);
-                Invoke("ResetAnimation", 0.15f);
+                //animator.SetBool("isCollect", true);
+                //Invoke("ResetAnimation", 0.15f);
 
                 return true;
             }
