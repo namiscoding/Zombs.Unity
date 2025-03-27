@@ -7,10 +7,15 @@ public class Mainmenu : MonoBehaviour
     public GameObject revivePanel;
     public GameObject startGamePanel;
     public GameObject ShopPanel;
+
     public GameObject resourcePanel;
     public GameObject Utility;
 
     public TMP_InputField playerNameInput;
+
+
+    private TimeManager timeManager;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     void Start()
     {
@@ -23,8 +28,13 @@ public class Mainmenu : MonoBehaviour
         revivePanel.SetActive(false);
         startGamePanel.SetActive(true);
         ShopPanel.SetActive(false);
+
         resourcePanel.SetActive(true);
         Utility.SetActive(false);
+
+
+        timeManager = FindAnyObjectByType<TimeManager>();
+        // Automatically find the InputField if not assigned in Inspector
 
         if (playerNameInput == null)
         {
@@ -128,5 +138,18 @@ public class Mainmenu : MonoBehaviour
         if (startGamePanel != null) startGamePanel.SetActive(false);
         Time.timeScale = 1;
         Debug.Log("Game started with player: " + playerName);
+        if (timeManager != null)
+        {
+            timeManager.StartNightCycle();
+            timeManager.StartTimeBar();
+        }
+        else
+        {
+            Debug.LogError("GameManager not found!");
+        }
+        revivePanel.SetActive(false); // Hide revive panel
+        startGamePanel.SetActive(false); // Hide start panel
+        Time.timeScale = 1; // Resume game
+        Debug.Log("Thong minh - Game started with player: " + playerName);
     }
 }

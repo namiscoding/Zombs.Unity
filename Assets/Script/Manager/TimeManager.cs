@@ -1,52 +1,22 @@
-using UnityEngine;
+﻿using UnityEngine;
+
 using UnityEngine.UI;
 using System.Collections;
-
-public class GameManager : MonoBehaviour
+public class TimeManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
-    private Center center;
-    public int CenterLevel => center != null ? center.GetLevel() : 0;
-    public bool HasCenter => center != null;
-
-    [SerializeField] private GameObject NightUI;
-    [SerializeField] private Text warningText;
+    [SerializeField] private GameObject NightUI; //Night UI panel
     [SerializeField] private Image nightBar;
     [SerializeField] private Image dayBar;
     [SerializeField] private Image nightBar2;
     [SerializeField] private Image dayBar2;
-    [SerializeField] private float timeDuration = 60f;
+    [SerializeField] private float timeDuration = 100f;
     private bool isNightActive = false;
     private bool isNightCycleRunning = false;
     private bool isTimeBarRunning = false;
     private float timeElapsed = 0f; // Track the current time in cycle
 
-    void Awake()
-    {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-    }
-
     void Start()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-    }
-
-    public void SetCenter(Center centerInstance)
-    {
-        if (center == null)
-        {
-            center = centerInstance;
-            // Trigger enemy spawning here
-            Debug.Log("Center built, enemies triggered!");
-        }
-    }
-
-    public void GameOver()
-    {
-        Debug.Log("Game Over! Center destroyed.");
-        // Implement game over logic (e.g., scene reload)
     }
 
     public void StartNightCycle()
@@ -68,16 +38,15 @@ public class GameManager : MonoBehaviour
             for (int i = 5; i > 0; i--)
             {
                 NotificationManager.Instance.ShowNotification($"Night starts in " + i + " seconds!");
-                warningText.gameObject.SetActive(true);
                 yield return new WaitForSeconds(1f); // Wait 1 second for countdown
             }
 
             // 🌙 Activate Night
             isNightActive = true;
             NightUI.SetActive(true);
-            warningText.gameObject.SetActive(false); // Hide warning after night starts
 
             //a feature of spawn enemy will be here.
+
             yield return new WaitForSeconds(timeDuration); // Night duration (60 seconds)
 
             // ☀️ Switch to Daytime
@@ -85,7 +54,6 @@ public class GameManager : MonoBehaviour
             NightUI.SetActive(false);
         }
     }
-
     public void StartTimeBar()
     {
         if (!isTimeBarRunning) // Run only if it's not already running
@@ -94,7 +62,6 @@ public class GameManager : MonoBehaviour
             StartCoroutine(ToggleTimeBar());
         }
     }
-
     IEnumerator ToggleTimeBar()
     {
         while (true)
@@ -117,15 +84,14 @@ public class GameManager : MonoBehaviour
                 float barFillAmount2 = 1 - (timeElapsed / timeDuration);
                 nightBar2.fillAmount = barFillAmount2;
                 yield return null; // Wait for the next frame
-            }; // Short delay before switching
-
+            }
+            ; // Short delay before switching
             timeElapsed = 0f; // Reset for the next phase
             // Process 2: Empty night bar, Fill day bar (1 → 0)
             nightBar.gameObject.SetActive(false); // Hide night bar
             dayBar.gameObject.SetActive(true);   // Show day bar
             nightBar2.gameObject.SetActive(false); // Hide night bar
             dayBar2.gameObject.SetActive(true);
-
             while (timeElapsed < timeDuration)
             {
                 timeElapsed += Time.deltaTime;

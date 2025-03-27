@@ -1,5 +1,5 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
+using TMPro;
 
 public class PlayerCollect : MonoBehaviour
 {
@@ -14,14 +14,12 @@ public class PlayerCollect : MonoBehaviour
         hasDealtDamage = false;
         GetComponent<Collider2D>().enabled = true;
     }
-    private void Awake()
-    {
 
-    }
     public void SetPool(ObjectPool pool)
     {
         objectPool = pool;
     }
+
     void Update()
     {
         if (Time.time > lifeTime)
@@ -55,6 +53,7 @@ public class PlayerCollect : MonoBehaviour
             ReturnToPoolOrDestroy();
         }
     }
+
     private void ReturnToPoolOrDestroy()
     {
         if (objectPool != null)
