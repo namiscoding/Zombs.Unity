@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class Center : Building
 {
-    private float currentRange;
+    [HideInInspector]
+    public float currentRange;
     private GameObject rangeVisual;
     private LineRenderer rangeBorder;
     private SpriteRenderer rangeFill;
