@@ -871,8 +871,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 43.8015, y: 0.13428}
-  m_SizeDelta: {x: 87.6029, y: 16.193}
+  m_AnchoredPosition: {x: 47.275, y: -0.42872}
+  m_SizeDelta: {x: 94.55, y: 38.341}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &140868959
 GameObject:
@@ -1799,8 +1799,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 43.8015, y: 0.13428}
-  m_SizeDelta: {x: 87.6029, y: 16.193}
+  m_AnchoredPosition: {x: 47.275, y: -0.42874}
+  m_SizeDelta: {x: 94.551, y: 38.341}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &285215377
 CanvasRenderer:
@@ -2139,7 +2139,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Recharge Delay:'
+  m_text: 'DMG Reduction:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2697,7 +2697,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NightUI: {fileID: 913222140}
-  warningText: {fileID: 944760355}
   nightBar: {fileID: 285215378}
   dayBar: {fileID: 111781968}
   nightBar2: {fileID: 757358821}
@@ -8590,8 +8589,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -43.90069, y: 0.1343}
-  m_SizeDelta: {x: 87.8014, y: 16.1929}
+  m_AnchoredPosition: {x: -46.999, y: -0.4288}
+  m_SizeDelta: {x: 93.998, y: 38.341}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &757358820
 CanvasRenderer:
@@ -248806,7 +248805,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.54509807}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -251704,8 +251703,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -266.92795, y: -221.7}
-  m_SizeDelta: {x: 178.8948, y: 19.0886}
+  m_AnchoredPosition: {x: -832.8353, y: -478.04916}
+  m_SizeDelta: {x: 195.2242, y: 44.9902}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1207241344
 GameObject:
@@ -253457,7 +253456,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Recharge Delay:'
+  m_text: 'DMG Reduction:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -254695,8 +254694,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.098845, y: 0.13435}
-  m_SizeDelta: {x: 2.4946, y: 14.6995}
+  m_AnchoredPosition: {x: -0.005, y: -0.42873}
+  m_SizeDelta: {x: 4.9347, y: 38.341}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1489760787
 MonoBehaviour:
@@ -256109,8 +256108,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.09884602, y: 0.13435}
-  m_SizeDelta: {x: 175.41, y: 16.193}
+  m_AnchoredPosition: {x: 0.2765, y: -0.4288}
+  m_SizeDelta: {x: 188.5486, y: 38.3408}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1711562459
 MonoBehaviour:
@@ -257370,8 +257369,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -43.90069, y: 0.1343}
-  m_SizeDelta: {x: 87.8014, y: 16.1929}
+  m_AnchoredPosition: {x: -46.999, y: -0.42874}
+  m_SizeDelta: {x: 93.998, y: 38.341}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1867244353
 CanvasRenderer:
@@ -258605,8 +258604,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00056028366, y: 0.2345}
-  m_SizeDelta: {x: 178.89, y: 18.6192}
+  m_AnchoredPosition: {x: 0.00060511, y: -0.000037193}
+  m_SizeDelta: {x: 195.23, y: 44.99}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2009162982
 MonoBehaviour:

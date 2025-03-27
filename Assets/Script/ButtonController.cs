@@ -15,6 +15,6 @@ public class ButtonController : MonoBehaviour
 
     void OnDamageButtonClicked()
     {
-       
+       player.TakeDamage(damageAmount);
     }
 }
