@@ -29,6 +29,20 @@ public abstract class Building : MonoBehaviour
 
         // Initialize the health bar
         InitializeHealthBar();
+
+        // Đảm bảo có collider
+        Collider2D collider = GetComponent<Collider2D>();
+        if (collider == null)
+        {
+            collider = gameObject.AddComponent<BoxCollider2D>();
+            Debug.Log($"Added BoxCollider2D to {data.buildingName}");
+        }
+        
+        // Đảm bảo collider không phải là trigger (trừ khi là cửa)
+        if (!(this is Barrier && ((BarrierData)data).isDoor))
+        {
+            collider.isTrigger = false;
+        }
     }
 
     protected virtual void InitializeHealthBar()

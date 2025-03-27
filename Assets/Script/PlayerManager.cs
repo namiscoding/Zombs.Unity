@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,6 +17,11 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private GameObject changeToSwordPanel;
     [SerializeField] private GameObject changeToBowPanel;
     [SerializeField] private GameObject changeToAxePanel;
+    [SerializeField] public float spinAttackDamage = 2f;  // Sát thương khi tấn công xoay vòng
+    [SerializeField] private float spinAttackDuration = 0.5f;  // Thời gian xoay vòng
+    [SerializeField] private float spinAttackSpeed = 720f;  // Tốc độ xoay (độ/giây)
+    [SerializeField] private float spinAttackCooldown = 0.2f;  // Thời gian giữa các lần gây sát thương
+    [SerializeField] private GameObject weaponCollider; // Tham chiếu đến WeaponCollider
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -32,6 +38,13 @@ public class PlayerManager : MonoBehaviour
     public TextMeshProUGUI playerName;
     public bool isAlive = true;
     private bool isArmorVisible = false;
+
+    private bool isSpinning = false;
+    private float spinTimer = 0f;
+    private Quaternion originalRotation;
+    private float lastDamageTime = 0f;
+    private HashSet<Collider2D> hitEnemiesThisAttack = new HashSet<Collider2D>();
+    private Collider2D weaponColliderComponent;
 
     void Awake()
     {
@@ -64,16 +77,48 @@ public class PlayerManager : MonoBehaviour
         changeToBowPanel.SetActive(false);
         changeToAxePanel.SetActive(true);
         SyncWithAmorManager();
+        
+        // Lấy tham chiếu đến Collider2D của WeaponCollider
+        if (weaponCollider != null)
+        {
+            weaponColliderComponent = weaponCollider.GetComponent<Collider2D>();
+            // Đảm bảo collider bị tắt khi không tấn công
+            if (weaponColliderComponent != null)
+            {
+                weaponColliderComponent.enabled = false;
+            }
+        }
     }
 
     void Update()
     {
-        mouseP = m_Camera.ScreenToWorldPoint(Input.mousePosition);
-        mouseP.z = transform.position.z;
-        Vector3 rotation = mouseP - transform.position;
-        float rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
-        rotZ += 160f;
-        transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
+        if (isSpinning)
+        {
+            // Xử lý tấn công xoay vòng
+            HandleSpinAttack();
+            
+            // Kiểm tra nếu thả chuột phải thì dừng xoay
+            if (Input.GetMouseButtonUp(1))
+            {
+                StopSpinAttack();
+            }
+        }
+        else
+        {
+            // Xử lý quay theo chuột như bình thường
+            mouseP = m_Camera.ScreenToWorldPoint(Input.mousePosition);
+            mouseP.z = transform.position.z;
+            Vector3 rotation = mouseP - transform.position;
+            float rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
+            rotZ += 160f;
+            transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
+        }
+
+        // Kiểm tra nhấn chuột phải để tấn công xoay vòng
+        if (Input.GetMouseButtonDown(1) && !isSpinning)
+        {
+            StartSpinAttack();
+        }
     }
 
     void FixedUpdate()
@@ -120,8 +165,6 @@ public class PlayerManager : MonoBehaviour
             Die();
         }
     }
-
-
 
     void Die()
     {
@@ -357,4 +400,77 @@ public class PlayerManager : MonoBehaviour
             Debug.LogError("changeToAxePanel or axeManager is not assigned!");
         }
     }
+
+    private void StartSpinAttack()
+    {
+        isSpinning = true;
+        spinTimer = 0f;
+        lastDamageTime = 0f;
+        originalRotation = transform.rotation;
+        hitEnemiesThisAttack.Clear();
+        
+        // Bật collider của vũ khí khi bắt đầu tấn công
+        if (weaponColliderComponent != null)
+        {
+            weaponColliderComponent.enabled = true;
+        }
+    }
+
+    private void StopSpinAttack()
+    {
+        isSpinning = false;
+        
+        // Tắt collider của vũ khí khi kết thúc tấn công
+        if (weaponColliderComponent != null)
+        {
+            weaponColliderComponent.enabled = false;
+        }
+        
+        // Khi dừng xoay, cập nhật lại hướng quay theo chuột
+        mouseP = m_Camera.ScreenToWorldPoint(Input.mousePosition);
+        mouseP.z = transform.position.z;
+        Vector3 rotation = mouseP - transform.position;
+        float rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
+        rotZ += 160f;
+        transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
+    }
+
+    private void HandleSpinAttack()
+    {
+        // Xoay nhân vật liên tục với tốc độ cố định
+        transform.Rotate(0, 0, spinAttackSpeed * Time.deltaTime);
+        
+        // Kiểm tra va chạm với kẻ địch và gây sát thương theo chu kỳ
+        if (Time.time >= lastDamageTime + spinAttackCooldown)
+        {
+            hitEnemiesThisAttack.Clear(); // Reset danh sách enemy đã bị tấn công
+            lastDamageTime = Time.time;
+            
+            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, 1.5f);
+            foreach (Collider2D enemy in hitEnemies)
+            {
+                // Kiểm tra va chạm với EnemyWithWeapon
+                if (enemy.CompareTag("bodyEnemy") || enemy.CompareTag("Enemy"))
+                {
+                    EnemyWithWeapon enemyWithWeapon = enemy.GetComponent<EnemyWithWeapon>();
+                    if (enemyWithWeapon != null && !hitEnemiesThisAttack.Contains(enemy))
+                    {
+                        enemyWithWeapon.TakeDamage((int)spinAttackDamage);
+                        Debug.Log($"Đã gây {spinAttackDamage} sát thương cho EnemyWithWeapon");
+                        hitEnemiesThisAttack.Add(enemy);
+                    }
+                    
+                    // Kiểm tra va chạm với EnemyNoWeapon
+                    EnemyNoWeapon enemyNoWeapon = enemy.GetComponent<EnemyNoWeapon>();
+                    if (enemyNoWeapon != null && !hitEnemiesThisAttack.Contains(enemy))
+                    {
+                        enemyNoWeapon.TakeDamage((int)spinAttackDamage);
+                        Debug.Log($"Đã gây {spinAttackDamage} sát thương cho EnemyNoWeapon");
+                        hitEnemiesThisAttack.Add(enemy);
+                    }
+                }
+            }
+        }
+    }
+
 }

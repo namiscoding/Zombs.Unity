@@ -101,6 +101,8 @@ GameObject:
   - component: {fileID: 4841919689532320088}
   - component: {fileID: 8661613788980342406}
   - component: {fileID: 7980459713256704815}
+  - component: {fileID: 8401129228770485102}
+  - component: {fileID: 2284640504861486585}
   m_Layer: 7
   m_Name: MaceYellow
   m_TagString: bodyEnemy
@@ -213,8 +215,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.35907355, y: -0.12712972}
-  m_Size: {x: 1.4096645, y: 1.4096644}
+  m_Offset: {x: 0.35217977, y: -0.14507723}
+  m_Size: {x: 1.345015, y: 1.395432}
   m_Direction: 0
 --- !u!50 &4841919689532320088
 Rigidbody2D:
@@ -281,13 +283,45 @@ MonoBehaviour:
   weaponType: 1
   speed: 0
   maxHealth: 0
+  currentHealth: 4
   baseDamage: 0
   stopDistance: 2
   attackCooldown: 1
   attackRange: 2
   weaponRotationSpeed: 5
   healthBar: {fileID: 0}
+  currentState: 2
   armTransform: {fileID: 0}
+  rotationAngle: 50
+--- !u!114 &8401129228770485102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1710531046179627474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98ae2b93c9649fb4a847343c43c5a3fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 3
+  _rotationSpeed: 1000
+  _chaseDistanceThreshold: 1
+  armTransform: {fileID: 0}
+--- !u!114 &2284640504861486585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1710531046179627474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 0}
 --- !u!1 &6706831187733528701
 GameObject:
   m_ObjectHideFlags: 0
@@ -403,3 +437,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemy: {fileID: 0}

@@ -8,11 +8,14 @@ public class PlayerCollect : MonoBehaviour
     private ObjectPool objectPool;
     private float lifeTime;
     private bool hasDealtDamage = false;
+    private float spawnTime;
+
     void OnEnable()
     {
         lifeTime = Time.time + timeDestroy;
         hasDealtDamage = false;
         GetComponent<Collider2D>().enabled = true;
+        spawnTime = Time.time;
     }
     private void Awake()
     {
@@ -24,9 +27,9 @@ public class PlayerCollect : MonoBehaviour
     }
     void Update()
     {
-        if (Time.time > lifeTime)
+        if (Time.time - spawnTime >= lifeTime)
         {
-            ReturnToPoolOrDestroy();
+            ReturnToPool();
         }
     }
 
@@ -52,10 +55,28 @@ public class PlayerCollect : MonoBehaviour
 
             hasDealtDamage = true;
             GetComponent<Collider2D>().enabled = false;
-            ReturnToPoolOrDestroy();
+            ReturnToPool();
+        }
+
+        // Kiểm tra va chạm với enemy có vũ khí
+        EnemyWithWeapon enemyWithWeapon = collision.GetComponent<EnemyWithWeapon>();
+        if (enemyWithWeapon != null)
+        {
+            enemyWithWeapon.TakeDamage(damage);
+            ReturnToPool();
+            return;
+        }
+
+        // Kiểm tra va chạm với enemy không có vũ khí
+        EnemyNoWeapon enemyNoWeapon = collision.GetComponent<EnemyNoWeapon>();
+        if (enemyNoWeapon != null)
+        {
+            enemyNoWeapon.TakeDamage(damage);
+            ReturnToPool();
+            return;
         }
     }
-    private void ReturnToPoolOrDestroy()
+    private void ReturnToPool()
     {
         if (objectPool != null)
         {
