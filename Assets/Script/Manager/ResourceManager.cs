@@ -56,7 +56,7 @@ public class ResourceManager : MonoBehaviour
     {
         stone += quantity;      // Cộng số lượng đá
         UpdateResourceUI();    // Cập nhật lại UI
-    }
+    } 
 
     // Thêm gỗ
     public void AddWood(int quantity)

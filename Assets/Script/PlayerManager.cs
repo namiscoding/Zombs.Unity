@@ -19,8 +19,6 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private GameObject Arrow;
     [SerializeField] public GameObject spriteHolder; // Gắn SpriteHolder vào Inspector
 
-    
-
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private Camera m_Camera;
@@ -38,6 +36,16 @@ public class PlayerManager : MonoBehaviour
     public bool isAlive = true;
     private bool isArmorVisible = false;
     private Animator animatedSpriteAnimator;
+
+    // Thêm enum và biến trạng thái vũ khí
+    public enum WeaponState
+    {
+        Axe,
+        Bow,
+        Sword
+    }
+
+    private WeaponState currentWeaponState;
 
     void Awake()
     {
@@ -83,8 +91,11 @@ public class PlayerManager : MonoBehaviour
         if (animatedSpriteAnimator == null)
         {
             Debug.LogError("Animator not found on AnimatedSprite!");
-        }   
+        }
         SyncWithAmorManager();
+
+        // Khởi tạo trạng thái vũ khí ban đầu là Axe
+        currentWeaponState = WeaponState.Axe;
     }
 
     void Update()
@@ -143,8 +154,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-
-
     void Die()
     {
         Time.timeScale = 0;
@@ -177,6 +186,9 @@ public class PlayerManager : MonoBehaviour
         if (rb != null) rb.linearVelocity = Vector2.zero;
         if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite;
         if (mainmenu != null) mainmenu.startGame();
+
+        // Đặt lại trạng thái vũ khí về Axe khi hồi sinh
+        currentWeaponState = WeaponState.Axe;
     }
 
     public void ChangeToSword()
@@ -191,6 +203,7 @@ public class PlayerManager : MonoBehaviour
             }
             Debug.Log("Changed AnimatedSprite to sword sprite: " + animatedSpriteRenderer.sprite.name);
             Arrow.SetActive(false);
+            currentWeaponState = WeaponState.Sword; // Cập nhật trạng thái
         }
         else
         {
@@ -210,6 +223,7 @@ public class PlayerManager : MonoBehaviour
             }
             Debug.Log("Changed AnimatedSprite to bow sprite: " + animatedSpriteRenderer.sprite.name);
             Arrow.SetActive(true);
+            currentWeaponState = WeaponState.Bow; // Cập nhật trạng thái
         }
         else
         {
@@ -229,6 +243,7 @@ public class PlayerManager : MonoBehaviour
             }
             Debug.Log("Changed AnimatedSprite to axe sprite: " + animatedSpriteRenderer.sprite.name);
             Arrow.SetActive(false);
+            currentWeaponState = WeaponState.Axe; // Cập nhật trạng thái
         }
         else
         {
@@ -403,5 +418,11 @@ public class PlayerManager : MonoBehaviour
         {
             Debug.LogError("changeToAxePanel or axeManager is not assigned!");
         }
+    }
+
+    // (Tùy chọn) Phương thức để lấy trạng thái hiện tại nếu cần
+    public WeaponState GetCurrentWeaponState()
+    {
+        return currentWeaponState;
     }
 }

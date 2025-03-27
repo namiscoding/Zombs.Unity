@@ -119,7 +119,7 @@ public class WP_BowManager : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Not enough gold to upgrade to Bow Level {currentLevel + 1}! Required: {upgradeCosts[costIndex]} gold, Available: {ResourceManager.Instance.gold}");
+            NotificationManager.Instance.ShowNotification($"Not enough gold to upgrade to Bow Level {currentLevel + 1}!");
             return false;
         }
     }
