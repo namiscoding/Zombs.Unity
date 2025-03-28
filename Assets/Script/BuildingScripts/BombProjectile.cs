@@ -9,22 +9,53 @@ public class BombProjectile : Projectile
         this.explosionRadius = explosionRadius;
     }
 
-    protected override void OnHit()
+    protected override void OnTriggerEnter2D(Collider2D other)
+    {
+        // Check for EnemyNoWeapon
+        EnemyNoWeapon enemyNoWeapon = other.GetComponent<EnemyNoWeapon>();
+        if (enemyNoWeapon != null)
+        {
+            OnHit(enemyNoWeapon, null);
+            return;
+        }
+
+        // Check for EnemyWithWeapon
+        EnemyWithWeapon enemyWithWeapon = other.GetComponent<EnemyWithWeapon>();
+        if (enemyWithWeapon != null)
+        {
+            OnHit(null, enemyWithWeapon);
+        }
+    }
+
+    protected override void OnHit(EnemyNoWeapon hitEnemyNoWeapon, EnemyWithWeapon hitEnemyWithWeapon)
     {
         // Apply damage to the primary target
-        if (target != null)
+        if (hitEnemyNoWeapon != null)
         {
-            target.TakeDamage(damage);
+            hitEnemyNoWeapon.TakeDamage(damage);
+        }
+        else if (hitEnemyWithWeapon != null)
+        {
+            hitEnemyWithWeapon.TakeDamage(damage);
         }
 
         // Find all enemies within the explosion radius
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
         foreach (Collider2D hit in hits)
         {
-            Enemy enemy = hit.GetComponent<Enemy>();
-            if (enemy != null && enemy != target) // Exclude the primary target
+            // Check for EnemyNoWeapon
+            EnemyNoWeapon enemyNoWeapon = hit.GetComponent<EnemyNoWeapon>();
+            if (enemyNoWeapon != null && enemyNoWeapon != hitEnemyNoWeapon)
             {
-                enemy.TakeDamage(damage); // Explosion damage is the same as primary damage
+                enemyNoWeapon.TakeDamage(damage); // Explosion damage is the same as primary damage
+                continue;
+            }
+
+            // Check for EnemyWithWeapon
+            EnemyWithWeapon enemyWithWeapon = hit.GetComponent<EnemyWithWeapon>();
+            if (enemyWithWeapon != null && enemyWithWeapon != hitEnemyWithWeapon)
+            {
+                enemyWithWeapon.TakeDamage(damage); // Explosion damage is the same as primary damage
             }
         }
 

@@ -14,9 +14,11 @@ public class TimeManager : MonoBehaviour
     private bool isNightCycleRunning = false;
     private bool isTimeBarRunning = false;
     private float timeElapsed = 0f; // Track the current time in cycle
+    private EnemySpawner enemySpawner;
 
     void Start()
     {
+        enemySpawner = FindAnyObjectByType<EnemySpawner>();
     }
 
     public void StartNightCycle()
@@ -44,11 +46,12 @@ public class TimeManager : MonoBehaviour
             // 🌙 Activate Night
             isNightActive = true;
             NightUI.SetActive(true);
+            if (GameManager.Instance.HasCenter) enemySpawner.StartSpawning();
 
             //a feature of spawn enemy will be here.
 
             yield return new WaitForSeconds(timeDuration); // Night duration (60 seconds)
-
+            enemySpawner.StopSpawning();
             // ☀️ Switch to Daytime
             isNightActive = false;
             NightUI.SetActive(false);

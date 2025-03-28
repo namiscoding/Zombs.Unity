@@ -7,7 +7,8 @@ public abstract class Tower : Building
     protected float fireRate; // Current fire rate (shots per second)
     protected int damage; // Current damage per shot
     protected float fireCooldown; // Time until the next shot can be fired
-    protected Enemy target; // Current target enemy
+    protected EnemyNoWeapon targetNoWeapon; // Current target if EnemyNoWeapon
+    protected EnemyWithWeapon targetWithWeapon; // Current target if EnemyWithWeapon
     protected ProjectilePool projectilePool; // Pool for projectiles
 
     protected override void Start()
@@ -37,8 +38,8 @@ public abstract class Tower : Building
         }
 
         // Find the nearest enemy in range
-        target = FindNearestEnemyInRange();
-        if (target != null && fireCooldown <= 0)
+        FindNearestEnemyInRange();
+        if ((targetNoWeapon != null || targetWithWeapon != null) && fireCooldown <= 0)
         {
             Shoot();
             fireCooldown = 1f / fireRate; // Reset cooldown based on fire rate
@@ -56,29 +57,41 @@ public abstract class Tower : Building
         }
     }
 
-    private Enemy FindNearestEnemyInRange()
+    private void FindNearestEnemyInRange()
     {
-        Enemy nearestEnemy = null;
+        targetNoWeapon = null;
+        targetWithWeapon = null;
         float nearestDistance = float.MaxValue;
 
-        // Find all enemies in the scene
-        Enemy[] enemies = FindObjectsOfType<Enemy>();
-        foreach (Enemy enemy in enemies)
+        // Find all EnemyNoWeapon in the scene
+        EnemyNoWeapon[] enemiesNoWeapon = FindObjectsOfType<EnemyNoWeapon>();
+        foreach (EnemyNoWeapon enemy in enemiesNoWeapon)
         {
             if (enemy == null) continue;
 
             float distance = Vector2.Distance(transform.position, enemy.transform.position);
-            if (distance <= range)
+            if (distance <= range && distance < nearestDistance)
             {
-                if (distance < nearestDistance)
-                {
-                    nearestDistance = distance;
-                    nearestEnemy = enemy;
-                }
+                nearestDistance = distance;
+                targetNoWeapon = enemy;
+                targetWithWeapon = null; // Reset the other target
             }
         }
 
-        return nearestEnemy;
+        // Find all EnemyWithWeapon in the scene
+        EnemyWithWeapon[] enemiesWithWeapon = FindObjectsOfType<EnemyWithWeapon>();
+        foreach (EnemyWithWeapon enemy in enemiesWithWeapon)
+        {
+            if (enemy == null) continue;
+
+            float distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance <= range && distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                targetNoWeapon = null; // Reset the other target
+                targetWithWeapon = enemy;
+            }
+        }
     }
 
     protected virtual void Shoot()
@@ -93,7 +106,7 @@ public abstract class Tower : Building
         Projectile projectile = projectilePool.GetProjectile(transform.position, Quaternion.identity);
         if (projectile != null)
         {
-            projectile.SetTarget(target, damage, towerData.projectileSpeed);
+            projectile.SetTarget(targetNoWeapon, targetWithWeapon, damage, towerData.projectileSpeed);
         }
     }
 }

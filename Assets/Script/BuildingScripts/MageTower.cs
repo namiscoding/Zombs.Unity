@@ -11,7 +11,8 @@ public class MageTower : Tower
         }
 
         // Calculate the direction to the target
-        Vector3 direction = (target.transform.position - transform.position).normalized;
+        Vector3 targetPosition = targetNoWeapon != null ? targetNoWeapon.transform.position : targetWithWeapon.transform.position;
+        Vector3 direction = (targetPosition - transform.position).normalized;
         float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         // Shoot three bullets: center, left, and right
@@ -32,7 +33,7 @@ public class MageTower : Tower
         Projectile projectile = projectilePool.GetProjectile(transform.position, Quaternion.Euler(0, 0, angle));
         if (projectile != null)
         {
-            projectile.SetTarget(target, damage, towerData.projectileSpeed);
+            projectile.SetTarget(targetNoWeapon, targetWithWeapon, damage, towerData.projectileSpeed);
         }
     }
 }

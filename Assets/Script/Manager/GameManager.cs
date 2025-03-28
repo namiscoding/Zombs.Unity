@@ -10,19 +10,11 @@ public class GameManager : MonoBehaviour
     public bool HasCenter => center != null;
     
     // Add reference to the enemy spawner
-    private EnemySpawner enemySpawner;
 
     void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-        
-        // Find the enemy spawner in the scene
-        enemySpawner = FindObjectOfType<EnemySpawner>();
-        if (enemySpawner == null)
-        {
-            Debug.LogError("EnemySpawner not found in the scene!");
-        }
     }
 
     void Start()
@@ -36,12 +28,6 @@ public class GameManager : MonoBehaviour
         if (center == null)
         {
             center = centerInstance;
-            // Trigger enemy spawning when base is placed
-            if (enemySpawner != null)
-            {
-                enemySpawner.StartSpawning();
-                Debug.Log("Center built, enemy spawning started!");
-            }
         }
     }
 
@@ -49,11 +35,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Game Over! Center destroyed.");
         // Stop enemy spawning when game is over
-        if (enemySpawner != null)
-        {
-            enemySpawner.StopSpawning();
-        }
-        // Implement game over logic (e.g., scene reload)
+       
     }
 
 }

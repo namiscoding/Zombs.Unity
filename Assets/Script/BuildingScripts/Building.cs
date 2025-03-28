@@ -135,7 +135,6 @@ public abstract class Building : MonoBehaviour
     {
         if (currentLevel >= 6 || (currentLevel >= GameManager.Instance.CenterLevel && data is not CenterData))
         {
-            NotificationManager.Instance.ShowNotification("deo nang cap duoc");
             return;
         }
         int nextLevelIndex = currentLevel - 1;
@@ -154,7 +153,6 @@ public abstract class Building : MonoBehaviour
     {
         currentHealth = (int)(data.maxHealth * data.healthMultipliers[currentLevel - 1]);
         maxHealth = currentHealth; // Update maxHealth when stats change
-        NotificationManager.Instance.ShowNotification($"{currentHealth}");
     }
 
     protected virtual void UpdateSprite()

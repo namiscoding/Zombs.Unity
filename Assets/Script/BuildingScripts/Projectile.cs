@@ -2,9 +2,12 @@
 
 public class Projectile : MonoBehaviour
 {
-    protected Enemy target;
+    protected EnemyNoWeapon targetNoWeapon; // Target if it's an EnemyNoWeapon
+    protected EnemyWithWeapon targetWithWeapon; // Target if it's an EnemyWithWeapon
+    protected Vector3 targetPosition; // Fixed position to move towards
     protected int damage;
     protected float speed;
+    protected bool keepSpriteVertical; // If true, keep the sprite vertical
     protected ProjectilePool pool;
     private SpriteRenderer spriteRenderer;
 
@@ -22,41 +25,73 @@ public class Projectile : MonoBehaviour
         this.pool = pool;
     }
 
-    public void SetTarget(Enemy target, int damage, float speed)
+    public void SetTarget(EnemyNoWeapon targetNoWeapon, EnemyWithWeapon targetWithWeapon, int damage, float speed)
     {
-        this.target = target;
+        this.targetNoWeapon = targetNoWeapon;
+        this.targetWithWeapon = targetWithWeapon;
         this.damage = damage;
         this.speed = speed;
+
+        // Set the target position once based on the current position of the target
+        if (targetNoWeapon != null)
+        {
+            targetPosition = targetNoWeapon.transform.position;
+        }
+        else if (targetWithWeapon != null)
+        {
+            targetPosition = targetWithWeapon.transform.position;
+        }
+        else
+        {
+            targetPosition = transform.position; // Fallback to current position
+        }
+
+        // Set the initial rotation based on the target position
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        transform.rotation = Quaternion.Euler(0, 0, 90); 
+        
     }
 
     protected virtual void Update()
     {
-        if (target == null)
-        {
-            ReturnToPool();
-            return;
-        }
-
-        // Move towards the target
-        Vector3 direction = (target.transform.position - transform.position).normalized;
+        // Move towards the fixed target position
+        Vector3 direction = (targetPosition - transform.position).normalized;
         transform.position += direction * speed * Time.deltaTime;
 
-        // Rotate the projectile to face the target
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
-
-        // Check if the projectile has reached the target
-        if (Vector2.Distance(transform.position, target.transform.position) < 0.1f)
+        // Check if the projectile has reached the target position
+        if (Vector2.Distance(transform.position, targetPosition) < 0.1f)
         {
-            OnHit();
+            ReturnToPool();
         }
     }
 
-    protected virtual void OnHit()
+    protected virtual void OnTriggerEnter2D(Collider2D other)
     {
-        if (target != null)
+        // Check for EnemyNoWeapon
+        EnemyNoWeapon enemyNoWeapon = other.GetComponent<EnemyNoWeapon>();
+        if (enemyNoWeapon != null)
         {
-            target.TakeDamage(damage);
+            OnHit(enemyNoWeapon, null);
+            return;
+        }
+
+        // Check for EnemyWithWeapon
+        EnemyWithWeapon enemyWithWeapon = other.GetComponent<EnemyWithWeapon>();
+        if (enemyWithWeapon != null)
+        {
+            OnHit(null, enemyWithWeapon);
+        }
+    }
+
+    protected virtual void OnHit(EnemyNoWeapon hitEnemyNoWeapon, EnemyWithWeapon hitEnemyWithWeapon)
+    {
+        if (hitEnemyNoWeapon != null)
+        {
+            hitEnemyNoWeapon.TakeDamage(damage);
+        }
+        else if (hitEnemyWithWeapon != null)
+        {
+            hitEnemyWithWeapon.TakeDamage(damage);
         }
         ReturnToPool();
     }

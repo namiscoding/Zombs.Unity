@@ -71,6 +71,6 @@ MonoBehaviour:
   - 2.5
   - 4
   projectilePrefab: {fileID: 5199239949924597228, guid: 55559019b73bbd24e994601701274f15, type: 3}
-  projectileSpeed: 5
+  projectileSpeed: 10
   explosionRadius: 0
   angleBetweenBullets: 0

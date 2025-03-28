@@ -14,8 +14,8 @@ public class BombTower : Tower
         BombProjectile projectile = projectilePool.GetProjectile(transform.position, Quaternion.identity) as BombProjectile;
         if (projectile != null)
         {
-            projectile.SetTarget(target, damage, towerData.projectileSpeed);
-            projectile.SetExplosionData(towerData.explosionRadius); // Only pass explosionRadius
+            projectile.SetTarget(targetNoWeapon, targetWithWeapon, damage, towerData.projectileSpeed);
+            projectile.SetExplosionData(towerData.explosionRadius);
         }
     }
 }
