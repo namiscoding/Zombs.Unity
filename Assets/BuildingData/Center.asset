@@ -49,7 +49,7 @@ MonoBehaviour:
   - 2.5
   - 3
   - 3
-  baseRange: 100
+  baseRange: 20
   rangeMultipliers:
   - 1
   - 1.2

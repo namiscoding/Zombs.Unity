@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4074541167331786303}
   - component: {fileID: 4317563053959250409}
   - component: {fileID: 4293338767065134167}
-  - component: {fileID: 7843330827921606510}
+  - component: {fileID: 1186941806515546323}
   m_Layer: 7
   m_Name: CannonTower
   m_TagString: Untagged
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.04, y: 2.016291}
   m_EdgeRadius: 0
---- !u!114 &7843330827921606510
+--- !u!114 &1186941806515546323
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,9 +144,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8587006911522801587}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22e6a34eae86728449615b25ab4bb68b, type: 3}
+  m_Script: {fileID: 11500000, guid: 60fbc473d21b80f418f87738251f4c1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 0773a4bc500fc7e48b2756226b66ca0a, type: 2}
-  currentHealth: 20
+  currentHealth: 0
   healthBarPrefab: {fileID: 547374149651274230, guid: e5677161ded6ec44fbcb20bc2871e6a7, type: 3}

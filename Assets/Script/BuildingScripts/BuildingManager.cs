@@ -10,9 +10,9 @@ public class BuildingManager : MonoBehaviour
     private Camera mainCamera;
     private Dictionary<string, int> buildingCounts = new Dictionary<string, int>();
     private Dictionary<BuildingData, int> prefabIndices = new Dictionary<BuildingData, int>();
-    private Center lastClickedCenter = null; // Track the last clicked Center
+    private Center lastClickedCenter = null; // Track the single Center
     private Building lastClickedBuilding;
-    NotificationManager notificationManager;
+    private NotificationManager notificationManager;
 
     void Start()
     {
@@ -22,7 +22,7 @@ public class BuildingManager : MonoBehaviour
             Debug.LogError("No Main Camera found!");
             mainCamera = FindFirstObjectByType<Camera>();
         }
-        notificationManager = FindFirstObjectByType<NotificationManager>();
+        notificationManager = FindObjectOfType<NotificationManager>();
         // Initialize building counts and prefab indices
         for (int i = 0; i < buildingPrefabs.Length; i++)
         {
@@ -79,7 +79,7 @@ public class BuildingManager : MonoBehaviour
                 Debug.LogError($"BuildingData for {selectedBuilding.buildingName} has no sprite for Level 1!");
                 selectedBuilding = null;
                 return;
-            }
+            }   
             if (!GameManager.Instance.HasCenter && !(selectedBuilding is CenterData))
             {
                 notificationManager.ShowNotification("Must build Center first!");
@@ -139,10 +139,12 @@ public class BuildingManager : MonoBehaviour
 
         float overlapRadius = selectedBuilding is BarrierData ? 0.4f : 0.8f;
         bool canPlace = !Physics2D.OverlapCircle(mousePos, overlapRadius);
-        SpriteRenderer sr = buildingPreview.GetComponent<SpriteRenderer>();
-        sr.color = canPlace ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
+        bool withinCenterRange = selectedBuilding is CenterData || IsWithinCenterRange(mousePos); // Centers can be placed anywhere
 
-        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && canPlace)
+        SpriteRenderer sr = buildingPreview.GetComponent<SpriteRenderer>();
+        sr.color = canPlace && withinCenterRange ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
+
+        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && canPlace && withinCenterRange)
         {
             if (buildingCounts[selectedBuilding.buildingName] < selectedBuilding.maxQuantity &&
                 ResourceManager.Instance.CanAfford(selectedBuilding.baseCost))
@@ -160,11 +162,30 @@ public class BuildingManager : MonoBehaviour
                 CancelPlacement();
             }
         }
+        else if (Input.GetMouseButtonDown(0) && !withinCenterRange)
+        {
+            notificationManager.ShowNotification("Must place within Center's range!");
+        }
         else if (Input.GetMouseButtonDown(1))
         {
             CancelPlacement();
-        }   
-        
+        }
+    }
+
+    private bool IsWithinCenterRange(Vector3 position)
+    {
+        if (lastClickedCenter == null)
+        {
+            return false; // No Center in the scene
+        }
+
+        float range = lastClickedCenter.currentRange; // Use the range field from the Center class
+        Vector3 centerPos = lastClickedCenter.transform.position;
+
+        // Check if the position is within the square range of the Center
+        float deltaX = Mathf.Abs(position.x - centerPos.x);
+        float deltaY = Mathf.Abs(position.y - centerPos.y);
+        return deltaX <= range && deltaY <= range;
     }
 
     private Vector3 SnapPosition(Vector3 position)

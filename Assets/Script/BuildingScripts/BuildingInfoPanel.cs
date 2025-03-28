@@ -137,14 +137,14 @@ public class BuildingInfoPanel : MonoBehaviour
         // Type-specific stats
         if (currentBuilding.data is TowerData towerData)
         {
-            float currentDamage = GetStatValue(towerData.damage, towerData.damageMultipliers);
-            float upgradedDamage = canUpgrade ? towerData.damage * towerData.damageMultipliers[nextLevel - 1] : currentDamage;
+            float currentDamage = GetStatValue(towerData.baseDamage, towerData.damageMultipliers);
+            float upgradedDamage = canUpgrade ? towerData.baseDamage * towerData.damageMultipliers[nextLevel - 1] : currentDamage;
             stats += $"Damage: {currentDamage}";
             if (canUpgrade) stats += $" -> {upgradedDamage}\n";
             else stats += "\n";
 
-            float currentRange = GetStatValue(towerData.attackRange, towerData.rangeMultipliers);
-            float upgradedRange = canUpgrade ? towerData.attackRange * towerData.rangeMultipliers[nextLevel - 1] : currentRange;
+            float currentRange = GetStatValue(towerData.baseRange, towerData.rangeMultipliers);
+            float upgradedRange = canUpgrade ? towerData.baseRange * towerData.rangeMultipliers[nextLevel - 1] : currentRange;
             stats += $"Range: {currentRange}";
             if (canUpgrade) stats += $" -> {upgradedRange}\n";
             else stats += "\n";

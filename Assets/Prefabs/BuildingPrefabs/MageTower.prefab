@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8228317292947324393}
   - component: {fileID: 4167035328299004787}
   - component: {fileID: 7624599882674456212}
-  - component: {fileID: 5926876817668068928}
+  - component: {fileID: 4823274145726481940}
   m_Layer: 7
   m_Name: MageTower
   m_TagString: Untagged
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.03, y: 2.03}
   m_EdgeRadius: 0
---- !u!114 &5926876817668068928
+--- !u!114 &4823274145726481940
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4472291118830933963}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22e6a34eae86728449615b25ab4bb68b, type: 3}
+  m_Script: {fileID: 11500000, guid: f83c8682cb7c27a47a1d94c336364c90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 2ae97bd9017c14645af8abfac8a288cc, type: 2}

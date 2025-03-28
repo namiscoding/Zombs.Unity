@@ -7,7 +7,7 @@ public class ResourceManager : MonoBehaviour
 
     public int wood { get; private set; } = 200; 
     public int stone { get; private set; } = 200;
-    public int gold { get; private set; } = 200;
+    public int gold { get; private set; } = 1000;
     [SerializeField] private TextMeshProUGUI txtWood;     
     [SerializeField] private TextMeshProUGUI txtStone;    
     [SerializeField] private TextMeshProUGUI txtGold;

@@ -48,16 +48,7 @@ MonoBehaviour:
   - 2
   - 2.5
   - 3
-  attackRange: 10
-  attackSpeed: 3
-  damage: 10
-  damageMultipliers:
-  - 1
-  - 1.5
-  - 2
-  - 2.5
-  - 3
-  - 4
+  baseRange: 5
   rangeMultipliers:
   - 1
   - 1.2
@@ -65,3 +56,23 @@ MonoBehaviour:
   - 1.4
   - 1.5
   - 1.7
+  baseFireRate: 1
+  fireRateMultipliers:
+  - 1
+  - 1.2
+  - 1.3
+  - 1.4
+  - 1.5
+  - 1.7
+  baseDamage: 1
+  damageMultipliers:
+  - 1
+  - 1.5
+  - 2
+  - 2.5
+  - 3
+  - 4
+  projectilePrefab: {fileID: 3243523746078906077, guid: 4dfc49ec3375d364384c634daa37b991, type: 3}
+  projectileSpeed: 5
+  explosionRadius: 0
+  angleBetweenBullets: 30
