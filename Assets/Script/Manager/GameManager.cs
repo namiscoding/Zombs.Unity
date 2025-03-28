@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     
     // Add reference to the enemy spawner
     private EnemySpawner enemySpawner;
-
+    
     [SerializeField] private GameObject NightUI;
     [SerializeField] private Text warningText;
     [SerializeField] private Image nightBar;
@@ -23,7 +23,8 @@ public class GameManager : MonoBehaviour
     private bool isNightCycleRunning = false;
     private bool isTimeBarRunning = false;
     private float timeElapsed = 0f; // Track the current time in cycle
-
+    
+  
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -71,7 +72,7 @@ public class GameManager : MonoBehaviour
     public void StartNightCycle()
     {
         if (!isNightCycleRunning) // Run only if it's not already running
-        {
+        {  
             isNightCycleRunning = true;
             StartCoroutine(ToggleNightCycle());
         }

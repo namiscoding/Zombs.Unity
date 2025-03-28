@@ -162,6 +162,7 @@ GameObject:
   - component: {fileID: 8060221259313400366}
   - component: {fileID: 3937923934751039583}
   - component: {fileID: 2537259347929143656}
+  - component: {fileID: 8569501195814221445}
   m_Layer: 7
   m_Name: YellowNoWeapon
   m_TagString: bodyEnemy
@@ -355,3 +356,16 @@ MonoBehaviour:
   currentState: 2
   armTransform: {fileID: 8004819110668514649}
   rotationAngle: 50
+--- !u!114 &8569501195814221445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3938446972081389565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 0}

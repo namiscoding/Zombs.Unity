@@ -130,7 +130,6 @@ GameObject:
   - component: {fileID: 1844852163407124619}
   - component: {fileID: -4762398555006214022}
   - component: {fileID: -3004774324897400615}
-  - component: {fileID: 2658506072613293069}
   - component: {fileID: 8786718169910138661}
   m_Layer: 7
   m_Name: BlueMace
@@ -338,19 +337,6 @@ MonoBehaviour:
   currentState: 2
   armTransform: {fileID: 0}
   rotationAngle: 50
---- !u!114 &2658506072613293069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7654295971056341047}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemy: {fileID: 0}
 --- !u!114 &8786718169910138661
 MonoBehaviour:
   m_ObjectHideFlags: 0

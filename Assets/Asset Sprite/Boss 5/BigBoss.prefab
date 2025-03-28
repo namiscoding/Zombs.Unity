@@ -107,6 +107,7 @@ GameObject:
   - component: {fileID: 5261342109971882127}
   - component: {fileID: 2232600882847551088}
   - component: {fileID: 6644161887596641172}
+  - component: {fileID: 2156632390019772661}
   m_Layer: 7
   m_Name: BigBoss
   m_TagString: bodyEnemy
@@ -313,3 +314,16 @@ MonoBehaviour:
   _rotationSpeed: 1000
   _chaseDistanceThreshold: 1
   armTransform: {fileID: 0}
+--- !u!114 &2156632390019772661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4584052963165242701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 0}
