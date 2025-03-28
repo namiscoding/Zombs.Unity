@@ -1,12 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
     private Camera mainCam;
+    private HashSet<Collider2D> hitEnemies = new HashSet<Collider2D>();
     private Rigidbody2D rb; 
     public float force;
     WP_BowManager bowManager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private void OnEnable()
+    {
+        // Xóa danh sách k? ??ch ?ã b? ?ánh khi b?t collider
+        hitEnemies.Clear();
+        //UpdateDamageBasedOnWeapon(); // C?p nh?t l?i damage khi collider ???c b?t
+    }
     void Start()
     {
         bowManager = FindFirstObjectByType<WP_BowManager>();
@@ -51,7 +59,32 @@ public class Arrow : MonoBehaviour
         
         Debug.Log("Bullet instantiated and moving towards " + mousePos);
 
-        Destroy(gameObject, 5f);
+        //Destroy(gameObject, 5f);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Ki?m tra va ch?m v?i k? ??ch
+        if ((collision.CompareTag("bodyEnemy") || collision.CompareTag("Enemy")) && !hitEnemies.Contains(collision))
+        {
+            // Ki?m tra va ch?m v?i EnemyWithWeapon
+            EnemyWithWeapon enemyWithWeapon = collision.GetComponent<EnemyWithWeapon>();
+            if (enemyWithWeapon != null)
+            {
+                enemyWithWeapon.TakeDamage((int)force);
+                Debug.Log($"WeaponCollider: ?ã gây {force} sát th??ng cho EnemyWithWeapon");
+                hitEnemies.Add(collision);
+            }
+
+            // Ki?m tra va ch?m v?i EnemyNoWeapon
+            EnemyNoWeapon enemyNoWeapon = collision.GetComponent<EnemyNoWeapon>();
+            if (enemyNoWeapon != null)
+            {
+                enemyNoWeapon.TakeDamage((int)force);
+                Debug.Log($"WeaponCollider: ?ã gây {force} sát th??ng cho EnemyNoWeapon");
+                hitEnemies.Add(collision);
+            }
+        }
     }
 
     // Update is called once per frame
