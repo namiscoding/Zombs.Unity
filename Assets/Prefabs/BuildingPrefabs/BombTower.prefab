@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 241885118322360749}
   - component: {fileID: 4203421832228767529}
   - component: {fileID: 7409832542996182446}
-  - component: {fileID: 5532137352286070882}
+  - component: {fileID: 7330619606842659749}
   m_Layer: 7
   m_Name: BombTower
   m_TagString: Untagged
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.03, y: 2.03}
   m_EdgeRadius: 0
---- !u!114 &5532137352286070882
+--- !u!114 &7330619606842659749
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1395129553957966786}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22e6a34eae86728449615b25ab4bb68b, type: 3}
+  m_Script: {fileID: 11500000, guid: f15cb1b46c665c64dbf5c10744f7cd66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 178f2f18415cd22409a522bf81bf9f29, type: 2}
