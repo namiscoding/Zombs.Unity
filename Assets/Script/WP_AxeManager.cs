@@ -3,32 +3,36 @@ using UnityEngine;
 
 public class WP_AxeManager : MonoBehaviour
 {
-    [SerializeField] private int currentLevel = 1; 
-    private float[] damage = { 10f, 20f, 30f, 40f, 50f, 60f }; 
-    private int[] upgradeCosts = { 300, 600, 1200, 1800, 2400 }; 
+    [SerializeField] private int currentLevel = 1;
+    private float[] damage = { 10f, 20f, 30f, 40f, 50f, 60f };
+    private float[] collect = { 2, 4, 6, 8, 10, 12 };
+    private int[] upgradeCosts = { 300, 600, 1200, 1800, 2400 };
     private float currentAxeDamage;
 
-    [SerializeField] private Sprite[] axeSprites; 
-    [SerializeField] private Sprite[] axeSpritesWP; 
-    [SerializeField] private Sprite[] axeSpritesShop; 
+    [SerializeField] private Sprite[] axeSprites;
+    [SerializeField] private Sprite[] axeSpritesWP;
+    [SerializeField] private Sprite[] axeSpritesShop;
 
-    public TextMeshProUGUI AxePrice; 
-    public TextMeshProUGUI currentDamageTxt; 
-    public TextMeshProUGUI nextDamageTxt; 
+    public TextMeshProUGUI AxePrice;
+    public TextMeshProUGUI currentDamageTxt;
+    public TextMeshProUGUI nextDamageTxt;
+    public TextMeshProUGUI currentCollectTxt;  // Thêm để hiển thị collect hiện tại
+    public TextMeshProUGUI nextCollectTxt;     // Thêm để hiển thị collect tiếp theo
 
-    [SerializeField] private GameObject changeToAxePanel; 
-    [SerializeField] private GameObject changeToAxePanel2; 
+    [SerializeField] private GameObject changeToAxePanel;
+    [SerializeField] private GameObject changeToAxePanel2;
 
     private float lastUpgradeTime = 0f;
-    private float upgradeCooldown = 0.5f; 
+    private float upgradeCooldown = 0.5f;
 
     void Start()
     {
-        if (damage.Length != upgradeCosts.Length + 1)
+        if (damage.Length != upgradeCosts.Length + 1 || collect.Length != damage.Length)
         {
-            Debug.LogError("WP_AxeManager configuration mismatch!");
+            Debug.LogError("WP_AxeManager configuration mismatch! Damage, collect and upgradeCosts arrays must align properly.");
         }
-        if (AxePrice == null || currentDamageTxt == null || nextDamageTxt == null)
+        if (AxePrice == null || currentDamageTxt == null || nextDamageTxt == null ||
+            currentCollectTxt == null || nextCollectTxt == null)
         {
             Debug.LogError("One or more TextMeshProUGUI fields not assigned in Inspector!");
         }
@@ -48,34 +52,39 @@ public class WP_AxeManager : MonoBehaviour
         currentAxeDamage = GetCurrentDamage();
         UpdateAxePriceUI();
         UpdateAxeUI();
-        Debug.Log($"Game started - Axe Level: {currentLevel}, Damage: {currentAxeDamage}");
+        Debug.Log($"Game started - Axe Level: {currentLevel}, Damage: {currentAxeDamage}, Collect: {GetCurrentCollect()}");
     }
 
     public float GetCurrentDamage()
     {
-        return damage[currentLevel - 1]; // Truy cập dựa trên chỉ số từ 0
+        return damage[currentLevel - 1];
     }
 
-    public Sprite GetCurrentAxeSprite() // Dùng cho player sprite
+    public float GetCurrentCollect()
+    {
+        return collect[currentLevel - 1];
+    }
+
+    public Sprite GetCurrentAxeSprite()
     {
         return axeSprites[currentLevel - 1];
     }
 
-    public Sprite GetCurrentAxeSpriteWP() // Dùng cho UI (hiển thị cấp hiện tại)
+    public Sprite GetCurrentAxeSpriteWP()
     {
         return axeSpritesWP[currentLevel - 1];
     }
 
-    public Sprite GetCurrentAxeSpriteShop() // Dùng cho UI Shop (hiển thị cấp tiếp theo)
+    public Sprite GetCurrentAxeSpriteShop()
     {
-        if (currentLevel >= 6) // Nếu đã đạt cấp tối đa, trả về sprite cấp 6
+        if (currentLevel >= 6)
             return axeSpritesShop[5];
-        return axeSpritesShop[currentLevel]; // Trả về sprite của cấp tiếp theo
+        return axeSpritesShop[currentLevel];
     }
 
     public bool HasAxe()
     {
-        return true; // Luôn có rìu vì bắt đầu từ cấp 1
+        return true;
     }
 
     public bool UpgradeAxe(PlayerManager playerManager)
@@ -86,23 +95,23 @@ public class WP_AxeManager : MonoBehaviour
             return false;
         }
 
-        Debug.Log($"Before upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {ResourceManager.Instance.gold}");
+        Debug.Log($"Before upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Collect = {GetCurrentCollect()}, Gold = {ResourceManager.Instance.gold}");
 
-        if (currentLevel >= 6) // Đã đạt cấp tối đa
+        if (currentLevel >= 6)
         {
             Debug.Log("Axe is already at max level!");
             UpdateAxePriceUI();
             return false;
         }
 
-        int costIndex = currentLevel - 1; // Vì bắt đầu từ cấp 1, chỉ số mảng bắt đầu từ 0
+        int costIndex = currentLevel - 1;
         if (ResourceManager.Instance.gold >= upgradeCosts[costIndex])
         {
             ResourceManager.Instance.UseGold(upgradeCosts[costIndex]);
             currentLevel++;
             currentAxeDamage = GetCurrentDamage();
             lastUpgradeTime = Time.time;
-            Debug.Log($"After upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Gold = {ResourceManager.Instance.gold}");
+            Debug.Log($"After upgrade: Level = {currentLevel}, Damage = {GetCurrentDamage()}, Collect = {GetCurrentCollect()}, Gold = {ResourceManager.Instance.gold}");
             UpdateAxePriceUI();
             UpdateAxeUI();
             UpdateAxeUI2();
@@ -147,6 +156,27 @@ public class WP_AxeManager : MonoBehaviour
                 nextDamageTxt.text = "Max";
             }
             Debug.Log($"Next Damage UI updated to: {nextDamageTxt.text}");
+        }
+
+        // Cập nhật UI cho collect hiện tại
+        if (currentCollectTxt != null)
+        {
+            currentCollectTxt.text = GetCurrentCollect().ToString();
+            Debug.Log($"Current Collect UI updated to: {currentCollectTxt.text}");
+        }
+
+        // Cập nhật UI cho collect tiếp theo
+        if (nextCollectTxt != null)
+        {
+            if (currentLevel < 6)
+            {
+                nextCollectTxt.text = collect[currentLevel].ToString();
+            }
+            else
+            {
+                nextCollectTxt.text = "Max";
+            }
+            Debug.Log($"Next Collect UI updated to: {nextCollectTxt.text}");
         }
     }
 
