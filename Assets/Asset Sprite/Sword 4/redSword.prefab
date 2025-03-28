@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 3293921505328543566}
   - component: {fileID: 4781405919431472662}
   - component: {fileID: 6188478566683222850}
+  - component: {fileID: 1369754719226053371}
+  - component: {fileID: 3374797134491032883}
+  - component: {fileID: 8070039970003501020}
   m_Layer: 7
   m_Name: redSword
   m_TagString: bodyEnemy
@@ -29,8 +32,8 @@ Transform:
   m_GameObject: {fileID: 8651870911012989332}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.7658281, y: 4.3271856, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.8033, y: 4.3271856, z: 0}
+  m_LocalScale: {x: 0.9479, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2573508690660235267}
@@ -152,8 +155,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.25625902, y: -0.2127434}
-  m_Size: {x: 0.93230855, y: 0.9806597}
+  m_Offset: {x: 0.2532155, y: -0.19543397}
+  m_Size: {x: 0.9992647, y: 1.0152786}
   m_Direction: 0
 --- !u!95 &6188478566683222850
 Animator:
@@ -177,6 +180,61 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1369754719226053371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8651870911012989332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98ae2b93c9649fb4a847343c43c5a3fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 3
+  _rotationSpeed: 1000
+  _chaseDistanceThreshold: 1
+  armTransform: {fileID: 0}
+--- !u!114 &3374797134491032883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8651870911012989332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46a559f9877f0fc46b2c9c4edc86ffb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyType: 0
+  weaponType: 0
+  speed: 0
+  maxHealth: 0
+  currentHealth: 4
+  baseDamage: 0
+  stopDistance: 2
+  attackCooldown: 1
+  attackRange: 2
+  weaponRotationSpeed: 5
+  healthBar: {fileID: 0}
+  currentState: 1
+  armTransform: {fileID: 0}
+  rotationAngle: 50
+--- !u!114 &8070039970003501020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8651870911012989332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 0}
 --- !u!1 &9092874630895399322
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +245,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2573508690660235267}
   - component: {fileID: 1794754732510724045}
-  m_Layer: 0
+  - component: {fileID: 3746881622672189766}
+  m_Layer: 7
   m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,11 +298,11 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.17056}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -253,5 +312,18 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 0.65888}
   m_EdgeRadius: 0
+--- !u!114 &3746881622672189766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9092874630895399322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 0}
