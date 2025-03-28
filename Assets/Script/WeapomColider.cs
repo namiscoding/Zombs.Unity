@@ -3,28 +3,29 @@ using UnityEngine;
 
 public class WeapomColider : MonoBehaviour
 {
-    [SerializeField] private float damage; // Giá trị mặc định
+    [SerializeField] private float damage;
     private PlayerManager playerManager;
     private HashSet<Collider2D> hitEnemies = new HashSet<Collider2D>();
-    private WP_AxeManager WP_AxeManager;
-    private WP_SwordManager WP_swordManager;
+    private WP_AxeManager wpAxeManager;
+    private WP_SwordManager wpSwordManager;
+
     private void Start()
     {
-        WP_AxeManager = FindAnyObjectByType<WP_AxeManager>();
-        WP_swordManager = FindAnyObjectByType<WP_SwordManager>();
+        wpAxeManager = FindAnyObjectByType<WP_AxeManager>();
+        wpSwordManager = FindAnyObjectByType<WP_SwordManager>();
         playerManager = GetComponentInParent<PlayerManager>();
         if (playerManager == null)
         {
-            Debug.LogError("PlayerManager not found in parent!");
+            Debug.LogError("WeapomColider: PlayerManager not found in parent!");
         }
-        UpdateDamageBasedOnWeapon(); // Cập nhật damage ban đầu dựa trên vũ khí
+        UpdateDamageBasedOnWeapon();
     }
 
     private void OnEnable()
     {
-        // Xóa danh sách kẻ địch đã bị đánh khi bật collider
         hitEnemies.Clear();
-        UpdateDamageBasedOnWeapon(); // Cập nhật lại damage khi collider được bật
+        UpdateDamageBasedOnWeapon();
+        Debug.Log("WeapomColider: Enabled and damage set to " + damage);
     }
 
     private void UpdateDamageBasedOnWeapon()
@@ -34,47 +35,51 @@ public class WeapomColider : MonoBehaviour
             switch (playerManager.GetCurrentWeaponState())
             {
                 case PlayerManager.WeaponState.Axe:
-                    damage = WP_AxeManager.GetCurrentDamage();
-                    Debug.Log("WeaponCollider: Damage set to " + damage);
+                    if (wpAxeManager != null) damage = wpAxeManager.GetCurrentDamage();
+                    Debug.Log("WeapomColider: Damage set to " + damage + " (Axe)");
                     break;
                 case PlayerManager.WeaponState.Bow:
                     damage = 0f;
-                    Debug.Log("WeaponCollider: Damage set to " + damage);
+                    Debug.Log("WeapomColider: Damage set to " + damage + " (Bow)");
                     break;
                 case PlayerManager.WeaponState.Sword:
-                    damage = WP_swordManager.GetCurrentDamage();
-                    Debug.Log("WeaponCollider: Damage set to 5 " + damage);
+                    if (wpSwordManager != null) damage = wpSwordManager.GetCurrentDamage();
+                    Debug.Log("WeapomColider: Damage set to " + damage + " (Sword)");
                     break;
                 default:
-                    damage = 2f; // Giá trị mặc định nếu có lỗi
-                    Debug.LogWarning("WeaponCollider: Unknown weapon state" + damage);
+                    damage = 2f;
+                    Debug.LogWarning("WeapomColider: Unknown weapon state, default damage: " + damage);
                     break;
             }
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
-        // Kiểm tra va chạm với kẻ địch
+        Debug.Log("WeapomColider: Trigger entered with " + collision.gameObject.name + " (Tag: " + collision.tag + ")");
         if ((collision.CompareTag("bodyEnemy") || collision.CompareTag("Enemy")) && !hitEnemies.Contains(collision))
         {
-            // Kiểm tra va chạm với EnemyWithWeapon
             EnemyWithWeapon enemyWithWeapon = collision.GetComponent<EnemyWithWeapon>();
             if (enemyWithWeapon != null)
             {
                 enemyWithWeapon.TakeDamage((int)damage);
-                Debug.Log($"WeaponCollider: Đã gây {damage} sát thương cho EnemyWithWeapon");
+                Debug.Log($"WeapomColider: Dealt {damage} damage to EnemyWithWeapon");
                 hitEnemies.Add(collision);
             }
 
-            // Kiểm tra va chạm với EnemyNoWeapon
             EnemyNoWeapon enemyNoWeapon = collision.GetComponent<EnemyNoWeapon>();
             if (enemyNoWeapon != null)
             {
                 enemyNoWeapon.TakeDamage((int)damage);
-                Debug.Log($"WeaponCollider: Đã gây {damage} sát thương cho EnemyNoWeapon");
+                Debug.Log($"WeapomColider: Dealt {damage} damage to EnemyNoWeapon");
                 hitEnemies.Add(collision);
             }
         }
+    }
+
+    public void SetDamage(float newDamage)
+    {
+        damage = newDamage;
+        Debug.Log("WeapomColider: Damage manually set to " + damage);
     }
 }

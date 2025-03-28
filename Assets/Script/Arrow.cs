@@ -59,7 +59,7 @@ public class Arrow : MonoBehaviour
         
         Debug.Log("Bullet instantiated and moving towards " + mousePos);
 
-        //Destroy(gameObject, 5f);
+        Destroy(gameObject, 5f);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
