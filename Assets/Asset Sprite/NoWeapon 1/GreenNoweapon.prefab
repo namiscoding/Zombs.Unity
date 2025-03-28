@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4767833774113707328}
   - component: {fileID: 3277797991484849024}
   - component: {fileID: 4992973699052888691}
+  - component: {fileID: 6353687648813636241}
   m_Layer: 7
   m_Name: GreenNoweapon
   m_TagString: bodyEnemy
@@ -207,6 +208,19 @@ MonoBehaviour:
   currentState: 2
   armTransform: {fileID: 8738525804315140471}
   rotationAngle: 50
+--- !u!114 &6353687648813636241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5983034658779584603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 927a0f36fc21fb54494d08cb5b92ff9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 0}
 --- !u!1 &6903344262621808977
 GameObject:
   m_ObjectHideFlags: 0

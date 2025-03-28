@@ -28,7 +28,7 @@ public class EnemySpawner : MonoBehaviour
     
     // Add reference to center
     private Transform centerTransform;
-
+    private TimeManager TimeManager;
     private int currentWave = 0;
     private bool isSpawning = false;
     private Coroutine spawnCoroutine;

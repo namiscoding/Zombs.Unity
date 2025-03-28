@@ -55,4 +55,5 @@ public class GameManager : MonoBehaviour
         }
         // Implement game over logic (e.g., scene reload)
     }
+
 }
