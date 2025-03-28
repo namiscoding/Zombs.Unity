@@ -5,7 +5,7 @@ public class WP_AxeManager : MonoBehaviour
 {
     [SerializeField] private int currentLevel = 1;
     private float[] damage = { 10f, 20f, 30f, 40f, 50f, 60f };
-    private float[] collect = { 2, 4, 6, 8, 10, 12 };
+    private int[] collect = { 2, 4, 6, 8, 10, 12 }; // Đúng kiểu int
     private int[] upgradeCosts = { 300, 600, 1200, 1800, 2400 };
     private float currentAxeDamage;
 
@@ -16,8 +16,8 @@ public class WP_AxeManager : MonoBehaviour
     public TextMeshProUGUI AxePrice;
     public TextMeshProUGUI currentDamageTxt;
     public TextMeshProUGUI nextDamageTxt;
-    public TextMeshProUGUI currentCollectTxt;  // Thêm để hiển thị collect hiện tại
-    public TextMeshProUGUI nextCollectTxt;     // Thêm để hiển thị collect tiếp theo
+    public TextMeshProUGUI currentCollectTxt;
+    public TextMeshProUGUI nextCollectTxt;
 
     [SerializeField] private GameObject changeToAxePanel;
     [SerializeField] private GameObject changeToAxePanel2;
@@ -60,7 +60,7 @@ public class WP_AxeManager : MonoBehaviour
         return damage[currentLevel - 1];
     }
 
-    public float GetCurrentCollect()
+    public int GetCurrentCollect() // Đúng kiểu int
     {
         return collect[currentLevel - 1];
     }
@@ -158,14 +158,12 @@ public class WP_AxeManager : MonoBehaviour
             Debug.Log($"Next Damage UI updated to: {nextDamageTxt.text}");
         }
 
-        // Cập nhật UI cho collect hiện tại
         if (currentCollectTxt != null)
         {
             currentCollectTxt.text = GetCurrentCollect().ToString();
             Debug.Log($"Current Collect UI updated to: {currentCollectTxt.text}");
         }
 
-        // Cập nhật UI cho collect tiếp theo
         if (nextCollectTxt != null)
         {
             if (currentLevel < 6)
