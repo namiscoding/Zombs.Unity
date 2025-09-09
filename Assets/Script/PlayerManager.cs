@@ -1,17 +1,23 @@
-using TMPro;
+﻿using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Splines;
 
 public class PlayerManager : MonoBehaviour
 {
     [SerializeField] private float speed = 5.0f;
     [SerializeField] private float health, maxHealth = 10;
     [SerializeField] private HealthPlayer healthPlayer;
-    [SerializeField] private float armor, maxArmor = 10;
+    [SerializeField] private float armor, maxArmor = 0;
     [SerializeField] private ArmorPlayer armorPlayer;
     [SerializeField] private Sprite hammerSprite;
-    [SerializeField] private Sprite swordSprite;
     [SerializeField] private Sprite bowSprite;
+    [SerializeField] private GameObject changeToSwordPanel;
+    [SerializeField] private GameObject changeToBowPanel;
+    [SerializeField] private GameObject changeToAxePanel;
+    [SerializeField] private GameObject Arrow;
+    [SerializeField] public GameObject spriteHolder; // Gắn SpriteHolder vào Inspector
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -19,9 +25,27 @@ public class PlayerManager : MonoBehaviour
     private Vector3 mouseP;
     private SpriteRenderer spriteRenderer;
     private Mainmenu mainmenu;
-    public TextMeshProUGUI playerName; 
+    private ShopManager shopManager;
+    private AmorManager amorManager;
+    private WP_SwordManager swordManager;
+    private WP_BowManager bowManager;
+    private WP_AxeManager axeManager;
+    //private Animator animator;
 
-    private bool isArmorVisible = false; // Ẩn thanh Armor khi bắt đầu game
+    public TextMeshProUGUI playerName;
+    public bool isAlive = true;
+    private bool isArmorVisible = false;
+    private Animator animatedSpriteAnimator;
+
+    // Thêm enum và biến trạng thái vũ khí
+    public enum WeaponState
+    {
+        Axe,
+        Bow,
+        Sword
+    }
+
+    private WeaponState currentWeaponState;
 
     void Awake()
     {
@@ -37,21 +61,52 @@ public class PlayerManager : MonoBehaviour
         if (rb == null) Debug.LogError("Rigidbody2D is missing!");
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = hammerSprite;
-        mainmenu = FindAnyObjectByType<Mainmenu>();
+        mainmenu = FindFirstObjectByType<Mainmenu>();
+        shopManager = FindFirstObjectByType<ShopManager>();
+        amorManager = FindFirstObjectByType<AmorManager>();
+        swordManager = FindFirstObjectByType<WP_SwordManager>();
+        bowManager = FindFirstObjectByType<WP_BowManager>();
+        axeManager = FindFirstObjectByType<WP_AxeManager>();
+        if (mainmenu == null) Debug.LogError("Mainmenu not found!");
+        if (shopManager == null) Debug.LogError("ShopManager not found!");
+        if (amorManager == null) Debug.LogError("AmorManager not found!");
+        if (swordManager == null) Debug.LogError("WP_SwordManager not found!");
+        if (bowManager == null) Debug.LogError("WP_BowManager not found!");
+        if (axeManager == null) Debug.LogError("WP_AxeManager not found!");
         gameObject.SetActive(false);
+        changeToSwordPanel.SetActive(false);
+        changeToBowPanel.SetActive(false);
+        changeToAxePanel.SetActive(true);
+        Arrow.SetActive(false);
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        animatedSpriteAnimator = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<Animator>();
+        if (animatedSpriteRenderer != null)
+        {
+            animatedSpriteRenderer.sprite = hammerSprite;
+        }
+        else
+        {
+            Debug.LogError("Failed to set initial hammer sprite: AnimatedSprite not found under SpriteHolder!");
+        }
+        if (animatedSpriteAnimator == null)
+        {
+            Debug.LogError("Animator not found on AnimatedSprite!");
+        }
+        SyncWithAmorManager();
 
-        // Ẩn thanh Armor khi bắt đầu game
-        armorPlayer.gameObject.SetActive(false);
+        // Khởi tạo trạng thái vũ khí ban đầu là Axe
+        currentWeaponState = WeaponState.Axe;
     }
 
     void Update()
     {
+        // Tính toán rotation cơ bản dựa trên vị trí chuột
         mouseP = m_Camera.ScreenToWorldPoint(Input.mousePosition);
-        mouseP.z = transform.position.z;
-        Vector3 rotation = mouseP - transform.position;
+        mouseP.z = spriteHolder.transform.position.z;
+        Vector3 rotation = mouseP - spriteHolder.transform.position;
         float rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
-        rotZ += 160f;
-        transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
+        rotZ += 160f; // Offset của bạn
+        spriteHolder.transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
     }
 
     void FixedUpdate()
@@ -62,118 +117,312 @@ public class PlayerManager : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
-        Debug.Log("Move Input: " + moveInput); // Debug
     }
 
     public void TakeDamage(float damage)
     {
+        if (!isAlive) return; // Nếu đã chết, không nhận damage
+
+        // Ghi log khi nhận damage
+        Debug.Log($"Player nhận {damage} sát thương!");
+
         if (isArmorVisible && armor > 0)
         {
-            // Trừ máu từ Armor trước
             armor -= damage;
-            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
-
-            // Nếu Armor hết thì ẩn thanh Armor
             if (armor <= 0)
             {
                 armor = 0;
-                armorPlayer.UpdatePlayerArmor(armor, maxArmor);
                 armorPlayer.gameObject.SetActive(false);
                 isArmorVisible = false;
             }
+            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
         }
         else
         {
-            // Trừ máu từ Health khi không còn Armor
             health -= damage;
-            healthPlayer.UpdatePlayerHealth(health, maxHealth);
         }
+
+        // ✅ Cập nhật lại thanh máu sau khi trừ
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+
+        // Ghi log trạng thái sau khi trừ damage
+        Debug.Log($"Armor: {armor} / {maxArmor}, Health: {health} / {maxHealth}");
 
         if (health <= 0)
         {
             Die();
         }
     }
-    
 
     void Die()
     {
         Time.timeScale = 0;
-        gameObject.SetActive(false); // Hide instead of destroy
-        mainmenu.Revive();
+        gameObject.SetActive(false);
+        if (mainmenu != null) mainmenu.Revive();
     }
 
     public void Revive()
     {
-        // Reset health to maximum
         health = maxHealth;
-        
-        healthPlayer.UpdatePlayerHealth(health, maxHealth); // Update UI
-        
-        armor = maxArmor;
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+
+        if (amorManager != null)
+        {
+            amorManager.ResetArmor();
+            armor = amorManager.GetCurrentArmor();
+            maxArmor = amorManager.GetMaxArmor();
+        }
+        else
+        {
+            armor = maxArmor;
+        }
         armorPlayer.UpdatePlayerArmor(armor, maxArmor);
 
-        // Reset position to starting point
         transform.position = Vector3.zero;
-
-        // Reset rotation
         transform.rotation = Quaternion.identity;
-
-        // Ensure the GameObject is active
         gameObject.SetActive(true);
-
-        // Resume game time
         Time.timeScale = 1;
 
-        // Reset velocity
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-        }
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (spriteRenderer != null) spriteRenderer.sprite = hammerSprite;
+        if (mainmenu != null) mainmenu.startGame();
 
-        // Reset to default sprite (hammer)
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.sprite = hammerSprite;
-        }
-        mainmenu.startGame(); // This might be a mistake - consider removing or adjusting logic
-        Debug.Log("Player Revived: " + playerName);
+        // Đặt lại trạng thái vũ khí về Axe khi hồi sinh
+        currentWeaponState = WeaponState.Axe;
     }
 
-    public void ChangeToHammer() { spriteRenderer.sprite = hammerSprite; }
-    public void ChangeToSword() { spriteRenderer.sprite = swordSprite; }
-    public void ChangeToBow() { spriteRenderer.sprite = bowSprite; }
+    public void ChangeToSword()
+    {
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        if (animatedSpriteRenderer != null && swordManager != null)
+        {
+            animatedSpriteRenderer.sprite = swordManager.GetCurrentSwordSprite();
+            if (animatedSpriteAnimator != null)
+            {
+                animatedSpriteAnimator.enabled = true; // Enable animation for sword
+            }
+            Debug.Log("Changed AnimatedSprite to sword sprite: " + animatedSpriteRenderer.sprite.name);
+            Arrow.SetActive(false);
+            currentWeaponState = WeaponState.Sword; // Cập nhật trạng thái
+        }
+        else
+        {
+            Debug.LogError("AnimatedSprite child not found under SpriteHolder, missing SpriteRenderer, or swordManager is null!");
+        }
+    }
 
-    // New method to set the player name
+    public void ChangeToBow()
+    {
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        if (animatedSpriteRenderer != null && bowManager != null)
+        {
+            animatedSpriteRenderer.sprite = bowManager.GetCurrentBowSprite();
+            if (animatedSpriteAnimator != null)
+            {
+                animatedSpriteAnimator.enabled = false; // Disable animation for bow
+            }
+            Debug.Log("Changed AnimatedSprite to bow sprite: " + animatedSpriteRenderer.sprite.name);
+            Arrow.SetActive(true);
+            currentWeaponState = WeaponState.Bow; // Cập nhật trạng thái
+        }
+        else
+        {
+            Debug.LogError("AnimatedSprite child not found under SpriteHolder, missing SpriteRenderer, or bowManager is null!");
+        }
+    }
+
+    public void ChangeToAxe()
+    {
+        SpriteRenderer animatedSpriteRenderer = spriteHolder.transform.Find("AnimatedSprite")?.GetComponent<SpriteRenderer>();
+        if (animatedSpriteRenderer != null && axeManager != null)
+        {
+            animatedSpriteRenderer.sprite = axeManager.GetCurrentAxeSprite();
+            if (animatedSpriteAnimator != null)
+            {
+                animatedSpriteAnimator.enabled = true; // Enable animation for axe
+            }
+            Debug.Log("Changed AnimatedSprite to axe sprite: " + animatedSpriteRenderer.sprite.name);
+            Arrow.SetActive(false);
+            currentWeaponState = WeaponState.Axe; // Cập nhật trạng thái
+        }
+        else
+        {
+            Debug.LogError("AnimatedSprite child not found under SpriteHolder, missing SpriteRenderer, or axeManager is null!");
+        }
+    }
+
     public void SetPlayerName(string name)
     {
-        playerName.text = name;
-        Debug.Log("Player name set to: " + playerName);
-        // You could also update a UI element here if you have a name display
+        if (playerName != null) playerName.text = name;
     }
 
-    //Phương thức hồi Full máu
     public void FullHeal()
-{
-    health = maxHealth;
-    healthPlayer.UpdatePlayerHealth(health, maxHealth); // Cập nhật UI thanh máu
-    
-    Debug.Log("Fully healed! Current health: " + health);
-
-    armor = maxArmor;
-    armorPlayer.UpdatePlayerArmor(armor, maxArmor); // Cập nhật UI thanh máu
-    Debug.Log("Fully healed! Current health: " + armor);
-}
-
-public void ToggleArmor()
     {
-        if (!isArmorVisible)
+        health = maxHealth;
+        healthPlayer.UpdatePlayerHealth(health, maxHealth);
+
+        if (amorManager != null)
         {
-            // Khi click để bật Armor lên
-            armor = maxArmor;
-            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
-            armorPlayer.gameObject.SetActive(true);
-            isArmorVisible = true;
+            amorManager.SetCurrentArmor(amorManager.GetMaxArmor());
+            armor = amorManager.GetCurrentArmor();
+            maxArmor = amorManager.GetMaxArmor();
         }
+        else
+        {
+            armor = maxArmor;
+        }
+        armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+    }
+
+    public void ToggleUtility()
+    {
+        if (mainmenu == null)
+        {
+            Debug.LogError("Mainmenu not found!");
+            return;
+        }
+
+        if (!mainmenu.Utility.activeSelf)
+        {
+            mainmenu.BuyUtility();
+            if (shopManager != null)
+            {
+                shopManager.PurchaseHealthPotion();
+            }
+            else
+            {
+                Debug.LogWarning("ShopManager not found! Cannot purchase health potion.");
+            }
+        }
+        else
+        {
+            Debug.Log("Utility is already active, no need to buy again.");
+        }
+    }
+
+    public void ToggleArmor()
+    {
+        if (amorManager != null)
+        {
+            armor = amorManager.GetCurrentArmor();
+            maxArmor = amorManager.GetMaxArmor();
+            if (maxArmor > 0)
+            {
+                if (armorPlayer != null)
+                {
+                    armorPlayer.gameObject.SetActive(true);
+                    isArmorVisible = true;
+                    armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+                }
+                else
+                {
+                    Debug.LogError("armorPlayer not assigned in Inspector!");
+                }
+            }
+            else
+            {
+                if (armorPlayer != null)
+                {
+                    armorPlayer.gameObject.SetActive(false);
+                    isArmorVisible = false;
+                }
+            }
+        }
+    }
+
+    public void SyncWithAmorManager()
+    {
+        if (amorManager != null)
+        {
+            maxArmor = amorManager.GetMaxArmor();
+            armor = amorManager.GetCurrentArmor();
+            float previousMaxHealth = maxHealth;
+            maxHealth = 10 + amorManager.GetMaxHealthBonus();
+            health += maxHealth - previousMaxHealth;
+            healthPlayer.UpdatePlayerHealth(health, maxHealth);
+            armorPlayer.UpdatePlayerArmor(armor, maxArmor);
+            if (maxArmor > 0 && armor > 0)
+            {
+                isArmorVisible = true;
+                armorPlayer.gameObject.SetActive(true);
+            }
+            else
+            {
+                isArmorVisible = false;
+                armorPlayer.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void ToggleSword()
+    {
+        if (changeToSwordPanel != null && swordManager != null)
+        {
+            changeToSwordPanel.SetActive(true);
+            var swordImage = changeToSwordPanel.GetComponent<UnityEngine.UI.Image>();
+            if (swordImage != null)
+            {
+                swordImage.sprite = swordManager.GetCurrentSwordSpriteWP();
+                Debug.Log("Sword UI updated with sprite: " + swordImage.sprite.name);
+            }
+            else
+            {
+                Debug.LogWarning("Sword Image component not found on changeToSwordPanel!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("changeToSwordPanel or swordManager is not assigned!");
+        }
+    }
+
+    public void ToggleBow()
+    {
+        if (changeToBowPanel != null && bowManager != null)
+        {
+            changeToBowPanel.SetActive(true);
+            var bowImage = changeToBowPanel.GetComponent<UnityEngine.UI.Image>();
+            if (bowImage != null)
+            {
+                bowImage.sprite = bowManager.GetCurrentBowSpriteWP();
+                Debug.Log("Bow UI updated with sprite: " + bowImage.sprite.name);
+            }
+            else
+            {
+                Debug.LogError("Bow Image component not found on changeToBowPanel!");
+            }
+        }
+        else
+        {
+            Debug.LogError("changeToBowPanel or bowManager is not assigned!");
+        }
+    }
+
+    public void ToggleAxe()
+    {
+        if (changeToAxePanel != null && axeManager != null)
+        {
+            changeToAxePanel.SetActive(true);
+            var axeImage = changeToAxePanel.GetComponent<UnityEngine.UI.Image>();
+            if (axeImage != null)
+            {
+                axeImage.sprite = axeManager.GetCurrentAxeSpriteWP();
+                Debug.Log("Axe UI updated with sprite: " + axeImage.sprite.name);
+            }
+            else
+            {
+                Debug.LogError("Axe Image component not found on changeToAxePanel!");
+            }
+        }
+        else
+        {
+            Debug.LogError("changeToAxePanel or axeManager is not assigned!");
+        }
+    }
+
+    // (Tùy chọn) Phương thức để lấy trạng thái hiện tại nếu cần
+    public WeaponState GetCurrentWeaponState()
+    {
+        return currentWeaponState;
     }
 }

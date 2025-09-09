@@ -12,7 +12,7 @@ public class HealPanel : MonoBehaviour, IPointerClickHandler
         {
             if (playerManager != null)
             {
-                playerManager.FullHeal();
+                //playerManager.FullHeal();
             }
         }
     }

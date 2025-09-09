@@ -1,65 +1,152 @@
-using UnityEngine;
-using TMPro; // Required for TextMeshPro
+﻿using UnityEngine;
+using TMPro;
 
 public class Mainmenu : MonoBehaviour
 {
+    PlayerManager playerManager;
     public GameObject revivePanel;
     public GameObject startGamePanel;
-    public TMP_InputField playerNameInput; // Reference to the InputField
     public GameObject ShopPanel;
 
+    public GameObject resourcePanel;
+    public GameObject Utility;
+
+    public TMP_InputField playerNameInput;
+
+
+    private TimeManager timeManager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
+        playerManager = FindAnyObjectByType<PlayerManager>();
+        if (revivePanel == null || startGamePanel == null || ShopPanel == null || resourcePanel == null || Utility == null)
+        {
+            Debug.LogError("One or more panel references are not assigned in the Inspector!");
+        }
+
         revivePanel.SetActive(false);
         startGamePanel.SetActive(true);
         ShopPanel.SetActive(false);
+
+        resourcePanel.SetActive(true);
+        Utility.SetActive(false);
+
+
+        timeManager = FindAnyObjectByType<TimeManager>();
         // Automatically find the InputField if not assigned in Inspector
+
         if (playerNameInput == null)
         {
-            playerNameInput = startGamePanel.transform.Find("InputField (TMP)").GetComponent<TMP_InputField>();
+            playerNameInput = startGamePanel.transform.Find("InputField (TMP)")?.GetComponent<TMP_InputField>();
             if (playerNameInput == null) Debug.LogError("InputField not found!");
         }
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-
+        if (playerManager != null)
+        {
+            //SetNoGold(playerManager.gold);
+        }
+        
     }
 
     public void OpenShop()
     {
+        Debug.Log("Opening Shop...");
         ShopPanel.SetActive(true);
-    }
-    public void CloseShop() {
-        ShopPanel.SetActive(false);
+        Debug.Log("ShopPanel active: " + ShopPanel.activeSelf + ", resourcePanel active: " + resourcePanel.activeSelf);
     }
 
+    public void CloseShop()
+    {
+        ShopPanel.SetActive(false);
+        Debug.Log("Shop closed, resourcePanel active: " + resourcePanel.activeSelf);
+    }
+
+    public void BuyUtility()
+    {
+        Debug.Log("Buying Health Potion...");
+        if (Utility == null)
+        {
+            Debug.LogError("Utility is not assigned in the Inspector!");
+            return;
+        }
+        if (ShopPanel != null && !ShopPanel.activeSelf)
+        {
+            ShopPanel.SetActive(true);
+        }
+        Utility.SetActive(true);
+        Debug.Log("Utility active: " + Utility.activeSelf);
+
+        var bloodButton = Utility.transform.Find("Blood");
+        if (bloodButton != null)
+        {
+            Debug.Log("Blood button active: " + bloodButton.gameObject.activeSelf);
+        }
+        else
+        {
+            Debug.LogWarning("Blood button not found inside Utility! Please check the Hierarchy.");
+        }
+    }
+
+    public void UserUtility()
+    {
+        Debug.Log("Using Health Potion...");
+        if (Utility != null) Utility.SetActive(false);
+
+        if (playerManager == null)
+        {
+            Debug.LogError("playerManager is null! Attempting to find it...");
+            playerManager = FindAnyObjectByType<PlayerManager>();
+            if (playerManager == null)
+            {
+                Debug.LogError("PlayerManager still not found in scene!");
+                return;
+            }
+        }
+
+        Debug.Log("Calling FullHeal on playerManager...");
+        playerManager.FullHeal();
+        Debug.Log("SOS - FullHeal called successfully");
+        Debug.Log("Health Potion Panel active: " + (Utility != null ? Utility.activeSelf : "null"));
+    }
+
+   
     public void Revive()
     {
-        revivePanel.SetActive(true); // Show Game Over UI
-        Time.timeScale = 0; // Pause the game
-        Debug.Log("Ngu");
+        if (revivePanel != null) revivePanel.SetActive(true);
+        Time.timeScale = 0;
+        Debug.Log("Revive panel opened");
     }
 
     public void startGame()
     {
-        // Get the text from the InputField
-        string playerName = playerNameInput.text;
-        if (string.IsNullOrEmpty(playerName)) playerName = "Player"; // Default name if empty
+        string playerName = playerNameInput != null ? playerNameInput.text : "Player";
+        if (string.IsNullOrEmpty(playerName)) playerName = "Player";
 
-        // Find the PlayerManager and set the name
-        PlayerManager playerManager = FindAnyObjectByType<PlayerManager>();
-        if (playerManager != null)
+        if (playerManager == null)
         {
-            playerManager.SetPlayerName(playerName); // Call new method in PlayerManager
+            playerManager = FindAnyObjectByType<PlayerManager>();
+            if (playerManager == null)
+            {
+                Debug.LogError("PlayerManager not found during startGame!");
+                return;
+            }
+        }
+
+        playerManager.SetPlayerName(playerName);
+        if (revivePanel != null) revivePanel.SetActive(false);
+        if (startGamePanel != null) startGamePanel.SetActive(false);
+        Time.timeScale = 1;
+        Debug.Log("Game started with player: " + playerName);
+        if (timeManager != null)
+        {
+            timeManager.StartNightCycle();
+            timeManager.StartTimeBar();
         }
         else
         {
-            Debug.LogError("PlayerManager not found!");
+            Debug.LogError("GameManager not found!");
         }
-
         revivePanel.SetActive(false); // Hide revive panel
         startGamePanel.SetActive(false); // Hide start panel
         Time.timeScale = 1; // Resume game

@@ -15,13 +15,6 @@ public class ButtonController : MonoBehaviour
 
     void OnDamageButtonClicked()
     {
-        if (player != null)
-        {
-            player.TakeDamage(damageAmount); // G?i hàm m?t máu c?a Player
-        }
-        else
-        {
-            Debug.LogError("Player reference is missing!");
-        }
+       player.TakeDamage(damageAmount);
     }
 }
